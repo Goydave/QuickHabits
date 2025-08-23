@@ -102,7 +102,7 @@ export default function AudioJournalPlayer({ isOpen, onOpenChange, onComplete }:
 
   return (
     <Dialog open={isOpen} onOpenChange={handleDialogClose}>
-      <DialogContent>
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="font-headline">Your Daily Journal Prompt</DialogTitle>
           <DialogDescription>

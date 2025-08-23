@@ -103,11 +103,11 @@ export default function HabitCard({ habit, onCheckIn }: HabitCardProps) {
       isCheckedIn ? 'bg-primary/20 border-primary' : 'bg-card'
     )}>
       <CardHeader className="flex-row items-center justify-between gap-4 space-y-0 pb-4">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
             <div className="p-3 rounded-lg bg-primary/10 text-primary">
-                <habit.icon className="w-6 h-6" />
+                <habit.icon className="w-5 h-5" />
             </div>
-            <CardTitle className="font-headline text-xl">{habit.name}</CardTitle>
+            <CardTitle className="font-headline text-lg md:text-xl">{habit.name}</CardTitle>
         </div>
         <Badge variant="secondary">Lvl {habit.level}</Badge>
       </CardHeader>

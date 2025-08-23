@@ -100,7 +100,7 @@ export default function AudioMeditationPlayer({ isOpen, onOpenChange, onComplete
 
   return (
     <Dialog open={isOpen} onOpenChange={handleDialogClose}>
-      <DialogContent className="max-h-[80vh] flex flex-col">
+      <DialogContent className="max-h-[80vh] flex flex-col sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="font-headline">Guided Meditation</DialogTitle>
           <DialogDescription>
