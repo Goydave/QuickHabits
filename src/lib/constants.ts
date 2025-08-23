@@ -10,7 +10,7 @@ export const PREDEFINED_HABITS: PredefinedHabit[] = [
   { id: 'eat-healthy', name: 'Eat Healthy', icon: Salad },
   { id: 'no-junk-food', name: 'No Junk Food', icon: Ban },
   { id: 'learn-something', name: 'Learn Something', icon: Lightbulb },
-  { id: 'journal', name: 'Journal', icon: PenSquare },
+  { id: 'journal', name: 'Journal', icon: PenSquare, specialAction: 'audio-journal' },
 ];
 
 export const STREAK_MILESTONES = [3, 7, 14, 30, 60, 100, 365];

@@ -5,11 +5,13 @@ import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/componen
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { Check, Share2, Mail, MessageSquare, Copy } from 'lucide-react';
+import { Check, Share2, Copy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { getXpForCurrentLevel, getXpForNextLevel } from '@/lib/game-mechanics';
+import { useState } from 'react';
+import AudioJournalPlayer from './AudioJournalPlayer';
 
 type HabitCardProps = {
   habit: Habit;
@@ -20,6 +22,8 @@ export default function HabitCard({ habit, onCheckIn }: HabitCardProps) {
   const { toast } = useToast();
   const today = new Date().toISOString().split('T')[0];
   const isCheckedIn = habit.lastCheckinDate === today;
+
+  const [isAudioPlayerOpen, setIsAudioPlayerOpen] = useState(false);
 
   const currentLevelXp = getXpForCurrentLevel(habit.level);
   const nextLevelXp = getXpForNextLevel(habit.level);
@@ -45,7 +49,28 @@ export default function HabitCard({ habit, onCheckIn }: HabitCardProps) {
     }
   };
 
+  const handleCheckInClick = () => {
+    if (habit.specialAction === 'audio-journal') {
+      setIsAudioPlayerOpen(true);
+    } else {
+      onCheckIn(habit.id);
+    }
+  };
+  
+  const handleAudioJournalComplete = () => {
+    onCheckIn(habit.id);
+    setIsAudioPlayerOpen(false);
+  }
+
   return (
+    <>
+       {habit.specialAction === 'audio-journal' && (
+        <AudioJournalPlayer
+          isOpen={isAudioPlayerOpen}
+          onOpenChange={setIsAudioPlayerOpen}
+          onComplete={handleAudioJournalComplete}
+        />
+      )}
     <Card className={cn(
       'flex flex-col transition-all duration-300 transform hover:scale-105 hover:shadow-xl',
       isCheckedIn ? 'bg-primary/20 border-primary' : 'bg-card'
@@ -76,7 +101,7 @@ export default function HabitCard({ habit, onCheckIn }: HabitCardProps) {
         <Button 
           size="lg" 
           className="flex-1" 
-          onClick={() => onCheckIn(habit.id)}
+          onClick={handleCheckInClick}
           disabled={isCheckedIn}
           variant={isCheckedIn ? 'secondary' : 'default'}
         >
@@ -98,5 +123,6 @@ export default function HabitCard({ habit, onCheckIn }: HabitCardProps) {
         </DropdownMenu>
       </CardFooter>
     </Card>
+    </>
   );
 }

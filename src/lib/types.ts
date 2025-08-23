@@ -20,6 +20,7 @@ export type PredefinedHabit = {
   id: string;
   name: string;
   icon: Icon;
+  specialAction?: 'audio-journal';
 };
 
 export type Habit = PredefinedHabit & {
