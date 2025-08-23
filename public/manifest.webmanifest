@@ -1,10 +1,10 @@
 {
   "name": "QuickHabits",
   "short_name": "QuickHabits",
-  "description": "Your Privacy-First Daily Habit Tracker",
+  "description": "Build habits, quickly.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#FFFBF0",
+  "background_color": "#000000",
   "theme_color": "#FFC107",
   "icons": [
     {
@@ -16,6 +16,29 @@
       "src": "/icons/icon-512x512.png",
       "sizes": "512x512",
       "type": "image/png"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Daily Focus",
+      "short_name": "Focus",
+      "description": "View your daily focus quest.",
+      "url": "/",
+      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Journal Prompt",
+      "short_name": "Journal",
+      "description": "Get a new audio journaling prompt.",
+      "url": "/?action=journal",
+      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Guided Meditation",
+      "short_name": "Meditate",
+      "description": "Start a new guided meditation session.",
+      "url": "/?action=meditate",
+      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
     }
   ]
 }

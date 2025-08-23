@@ -6,16 +6,48 @@ import Header from '@/components/Header';
 import HabitCard from '@/components/HabitCard';
 import { generateMotivationalPrompt } from '@/ai/flows/motivational-prompt';
 import { toast } from 'sonner';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Confetti from './ui/Confetti';
 import { STREAK_MILESTONES } from '@/lib/constants';
 import DailyFocus from './DailyFocus';
+import AudioJournalPlayer from './AudioJournalPlayer';
+import AudioMeditationPlayer from './AudioMeditationPlayer';
 
-export default function Dashboard() {
+type DashboardProps = {
+  action?: string | null;
+  onActionComplete?: () => void;
+}
+
+export default function Dashboard({ action, onActionComplete }: DashboardProps) {
   const { user } = useUser();
   const { habits, checkIn } = useHabits();
   const [showConfetti, setShowConfetti] = useState(false);
   const [confettiKey, setConfettiKey] = useState(0);
+
+  const [isAudioPlayerOpen, setIsAudioPlayerOpen] = useState(false);
+  const [isMeditationPlayerOpen, setIsMeditationPlayerOpen] = useState(false);
+
+  useEffect(() => {
+    if (action === 'journal') {
+      setIsAudioPlayerOpen(true);
+    } else if (action === 'meditate') {
+      setIsMeditationPlayerOpen(true);
+    }
+  }, [action]);
+
+  const handleAudioJournalComplete = () => {
+    const habit = habits.find(h => h.id === 'journal');
+    if (habit) handleCheckIn('journal');
+    setIsAudioPlayerOpen(false);
+    onActionComplete?.();
+  }
+
+  const handleAudioMeditationComplete = () => {
+    const habit = habits.find(h => h.id === 'meditate');
+    if (habit) handleCheckIn('meditate');
+    setIsMeditationPlayerOpen(false);
+    onActionComplete?.();
+  }
 
   const activeHabits = habits.filter(h => !h.isArchived);
 
@@ -67,6 +99,26 @@ export default function Dashboard() {
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground p-4 md:p-6">
       {showConfetti && <Confetti key={confettiKey} />}
+      
+      {/* Shortcut Handlers */}
+      <AudioJournalPlayer
+        isOpen={isAudioPlayerOpen}
+        onOpenChange={(isOpen) => {
+          setIsAudioPlayerOpen(isOpen);
+          if (!isOpen) onActionComplete?.();
+        }}
+        onComplete={handleAudioJournalComplete}
+      />
+      <AudioMeditationPlayer
+        isOpen={isMeditationPlayerOpen}
+        onOpenChange={(isOpen) => {
+          setIsMeditationPlayerOpen(isOpen);
+          if (!isOpen) onActionComplete?.();
+        }}
+        onComplete={handleAudioMeditationComplete}
+      />
+
+
       <Header />
       <main className="flex-grow pt-4 md:pt-8 max-w-6xl mx-auto w-full">
         <h1 className="text-2xl md:text-4xl font-bold font-headline text-center mb-2">
