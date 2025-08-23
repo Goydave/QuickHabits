@@ -7,6 +7,7 @@ import { Progress } from '@/components/ui/progress';
 import { Check, Share2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { STREAK_MILESTONES } from '@/lib/constants';
+import { useToast } from '@/hooks/use-toast';
 
 type HabitCardProps = {
   habit: Habit;
@@ -14,6 +15,7 @@ type HabitCardProps = {
 };
 
 export default function HabitCard({ habit, onCheckIn }: HabitCardProps) {
+  const { toast } = useToast();
   const today = new Date().toISOString().split('T')[0];
   const isCheckedIn = habit.lastCheckinDate === today;
 
@@ -30,12 +32,24 @@ export default function HabitCard({ habit, onCheckIn }: HabitCardProps) {
           url: window.location.href,
         });
       } catch (error) {
-        console.error('Sharing failed:', error);
-        // Fallback or just ignore if user cancels sharing
+        // This will catch errors if the user cancels the share or if sharing fails.
+        // We don't need to show an error message in this case.
+        console.log('Share action was cancelled or failed.');
       }
     } else {
-      navigator.clipboard.writeText(shareText);
-      alert('Share link copied to clipboard!');
+      try {
+        await navigator.clipboard.writeText(shareText);
+        toast({
+          title: 'Copied to clipboard!',
+          description: 'You can now share your streak with your friends.',
+        });
+      } catch (err) {
+        toast({
+          variant: 'destructive',
+          title: 'Oops!',
+          description: 'Could not copy to clipboard. Please try again.',
+        });
+      }
     }
   };
 
