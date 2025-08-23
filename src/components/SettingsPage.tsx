@@ -22,21 +22,49 @@ import { toast } from 'sonner';
 import { PREDEFINED_HABITS } from '@/lib/constants';
 import HabitSelector from './HabitSelector';
 import type { PredefinedHabit } from '@/lib/types';
-import { Separator } from './ui/separator';
+import { useTheme } from 'next-themes';
+import { RadioGroup, RadioGroupItem } from './ui/radio-group';
+import { Switch } from './ui/switch';
+import { Check, Palette, Moon, Sun } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import type { CoachingStyle } from '@/lib/types';
+
+const colorThemes = [
+  { name: 'Amber', class: 'theme-amber' },
+  { name: 'Green', class: 'theme-green' },
+  { name: 'Blue', class: 'theme-blue' },
+  { name: 'Violet', class: 'theme-violet' },
+];
 
 export default function SettingsPage() {
   const { user, setUser } = useUser();
   const { habits, addHabit, removeHabit, clearHabits } = useHabits();
+  const { theme, setTheme } = useTheme();
+
+  // Local state for form elements
   const [nickname, setNickname] = useState(user?.nickname || '');
+  const [enableMotivation, setEnableMotivation] = useState(user?.settings.enableMotivation ?? true);
+  const [coachingStyle, setCoachingStyle] = useState<CoachingStyle>(user?.settings.coachingStyle ?? 'encouraging');
+  const [colorTheme, setColorTheme] = useState(user?.settings.colorTheme ?? 'theme-amber');
 
-  const handleNicknameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setNickname(e.target.value);
-  };
-
-  const handleSaveNickname = () => {
+  const handleSaveProfile = () => {
     if (nickname.trim() && user) {
       setUser({ ...user, nickname: nickname.trim() });
       toast.success('Nickname updated successfully!');
+    }
+  };
+  
+  const handleSavePreferences = () => {
+     if (user) {
+      const newSettings = {
+        ...user.settings,
+        enableMotivation,
+        coachingStyle,
+        colorTheme,
+      };
+      setUser({ ...user, settings: newSettings });
+      document.body.className = colorTheme; // Apply theme class
+      toast.success('Preferences saved!');
     }
   };
 
@@ -44,13 +72,13 @@ export default function SettingsPage() {
     const currentHabitIds = habits.map(h => h.id);
     const selectedHabitIds = selected.map(h => h.id);
 
-    // Add new habits
     const habitsToAdd = selected.filter(h => !currentHabitIds.includes(h.id));
     habitsToAdd.forEach(habit => addHabit(habit.id));
 
-    // Remove old habits
     const habitsToRemove = habits.filter(h => !selectedHabitIds.includes(h.id));
     habitsToRemove.forEach(habit => removeHabit(habit.id));
+
+    toast.success('Habits updated!');
   };
   
   const handleResetAccount = () => {
@@ -76,13 +104,140 @@ export default function SettingsPage() {
               <Input
                 id="nickname"
                 value={nickname}
-                onChange={handleNicknameChange}
+                onChange={(e) => setNickname(e.target.value)}
               />
-              <Button onClick={handleSaveNickname} disabled={nickname === user?.nickname || !nickname.trim()}>
+              <Button onClick={handleSaveProfile} disabled={nickname === user?.nickname || !nickname.trim()}>
                 Save
               </Button>
             </div>
           </div>
+        </CardContent>
+      </Card>
+      
+      <Card>
+        <CardHeader>
+          <CardTitle>Appearance & Theme</CardTitle>
+          <CardDescription>Customize the look and feel of your app.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="space-y-2">
+             <Label>Color Theme</Label>
+             <div className="flex flex-wrap gap-3">
+               {colorThemes.map((ct) => (
+                 <button
+                   key={ct.class}
+                   onClick={() => setColorTheme(ct.class)}
+                   className={cn(
+                     'flex items-center gap-2 rounded-lg border p-3 text-sm transition-all',
+                     colorTheme === ct.class ? 'ring-2 ring-primary' : 'hover:bg-accent/50'
+                   )}
+                 >
+                   <div className={cn('h-5 w-5 rounded-full', ct.class, 'bg-primary')} />
+                   <span>{ct.name}</span>
+                   {colorTheme === ct.class && <Check className="h-4 w-4 text-primary" />}
+                 </button>
+               ))}
+             </div>
+          </div>
+          <div className="space-y-2">
+            <Label>Appearance</Label>
+             <RadioGroup
+              defaultValue={theme}
+              onValueChange={(value) => setTheme(value)}
+              className="grid max-w-md grid-cols-2 gap-8 pt-2"
+            >
+              <Label className="[&:has([data-state=checked])>div]:border-primary">
+                <RadioGroupItem value="light" className="sr-only" />
+                <div className="items-center rounded-md border-2 border-muted p-1 hover:border-accent">
+                  <div className="space-y-2 rounded-sm bg-[#ecedef] p-2">
+                    <div className="space-y-2 rounded-md bg-white p-2 shadow-sm">
+                      <div className="h-2 w-[80px] rounded-lg bg-[#ecedef]" />
+                      <div className="h-2 w-[100px] rounded-lg bg-[#ecedef]" />
+                    </div>
+                    <div className="flex items-center space-x-2 rounded-md bg-white p-2 shadow-sm">
+                      <div className="h-4 w-4 rounded-full bg-[#ecedef]" />
+                      <div className="h-2 w-[100px] rounded-lg bg-[#ecedef]" />
+                    </div>
+                  </div>
+                </div>
+                <span className="block w-full p-2 text-center font-normal">
+                  Light
+                </span>
+              </Label>
+              <Label className="[&:has([data-state=checked])>div]:border-primary">
+                <RadioGroupItem value="dark" className="sr-only" />
+                <div className="items-center rounded-md border-2 border-muted bg-popover p-1 hover:border-accent">
+                   <div className="space-y-2 rounded-sm bg-slate-950 p-2">
+                    <div className="space-y-2 rounded-md bg-slate-800 p-2 shadow-sm">
+                      <div className="h-2 w-[80px] rounded-lg bg-slate-400" />
+                      <div className="h-2 w-[100px] rounded-lg bg-slate-400" />
+                    </div>
+                    <div className="flex items-center space-x-2 rounded-md bg-slate-800 p-2 shadow-sm">
+                      <div className="h-4 w-4 rounded-full bg-slate-400" />
+                      <div className="h-2 w-[100px] rounded-lg bg-slate-400" />
+                    </div>
+                  </div>
+                </div>
+                 <span className="block w-full p-2 text-center font-normal">
+                  Dark
+                </span>
+              </Label>
+            </RadioGroup>
+          </div>
+          <Button onClick={handleSavePreferences}>Save Preferences</Button>
+        </CardContent>
+      </Card>
+
+       <Card>
+        <CardHeader>
+          <CardTitle>AI Coach & Notifications</CardTitle>
+          <CardDescription>Personalize your AI coach and manage notifications.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+           <div className="flex items-center justify-between space-x-2 rounded-lg border p-4">
+             <div className="flex flex-col">
+              <Label htmlFor="enable-motivation">Enable Motivational Coach</Label>
+              <p className="text-sm text-muted-foreground">
+                Receive AI-generated messages after check-ins.
+              </p>
+             </div>
+             <Switch
+                id="enable-motivation"
+                checked={enableMotivation}
+                onCheckedChange={setEnableMotivation}
+              />
+          </div>
+          <div className="space-y-2">
+            <Label>Coaching Style</Label>
+             <RadioGroup
+                value={coachingStyle}
+                onValueChange={(value: string) => setCoachingStyle(value as CoachingStyle)}
+                className="flex flex-col space-y-1"
+              >
+              <Label className="flex items-center space-x-3 rounded-md p-2 hover:bg-accent cursor-pointer">
+                <RadioGroupItem value="encouraging" />
+                <div>
+                  <p className="font-semibold">Encouraging</p>
+                  <p className="text-sm text-muted-foreground">Friendly and positive reinforcement.</p>
+                </div>
+              </Label>
+              <Label className="flex items-center space-x-3 rounded-md p-2 hover:bg-accent cursor-pointer">
+                <RadioGroupItem value="tough-love" />
+                 <div>
+                  <p className="font-semibold">Tough Love</p>
+                  <p className="text-sm text-muted-foreground">Direct, no-nonsense motivation.</p>
+                </div>
+              </Label>
+              <Label className="flex items-center space-x-3 rounded-md p-2 hover:bg-accent cursor-pointer">
+                <RadioGroupItem value="zen" />
+                 <div>
+                  <p className="font-semibold">Zen</p>
+                  <p className="text-sm text-muted-foreground">Mindful, calm, and reflective.</p>
+                </div>
+              </Label>
+            </RadioGroup>
+          </div>
+           <Button onClick={handleSavePreferences}>Save Preferences</Button>
         </CardContent>
       </Card>
 

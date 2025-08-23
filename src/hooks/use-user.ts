@@ -1,9 +1,15 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import type { User } from '@/lib/types';
+import type { User, UserSettings } from '@/lib/types';
 
 const USER_STORAGE_KEY = 'quickhabits-user';
+
+const defaultSettings: UserSettings = {
+  enableMotivation: true,
+  coachingStyle: 'encouraging',
+  colorTheme: 'theme-amber',
+};
 
 export function useUser() {
   const [user, setUserState] = useState<User | null>(null);
@@ -13,7 +19,22 @@ export function useUser() {
     try {
       const storedUser = localStorage.getItem(USER_STORAGE_KEY);
       if (storedUser) {
-        setUserState(JSON.parse(storedUser));
+        const parsedUser = JSON.parse(storedUser);
+        // Ensure settings exist and have defaults
+        const userWithSettings = {
+            ...parsedUser,
+            settings: {
+                ...defaultSettings,
+                ...(parsedUser.settings || {})
+            }
+        };
+        setUserState(userWithSettings);
+        // Apply theme on load
+        if (userWithSettings.settings.colorTheme) {
+            document.body.className = userWithSettings.settings.colorTheme;
+        } else {
+             document.body.className = defaultSettings.colorTheme;
+        }
       }
     } catch (error) {
       console.error("Failed to load user from local storage", error);
@@ -24,11 +45,20 @@ export function useUser() {
   const setUser = useCallback((newUser: User | null) => {
     try {
       if (newUser) {
-        localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(newUser));
+        // Ensure settings always have defaults
+        const userToSave = {
+          ...newUser,
+          settings: {
+            ...defaultSettings,
+            ...(newUser.settings || {})
+          }
+        };
+        localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(userToSave));
+        setUserState(userToSave);
       } else {
         localStorage.removeItem(USER_STORAGE_KEY);
+        setUserState(null);
       }
-      setUserState(newUser);
     } catch (error) {
       console.error("Failed to save user to local storage", error);
     }
@@ -38,6 +68,7 @@ export function useUser() {
     try {
       localStorage.removeItem(USER_STORAGE_KEY);
       setUserState(null);
+      document.body.className = ''; // Clear theme
     } catch (error) {
       console.error("Failed to clear user from local storage", error);
     }

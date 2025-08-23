@@ -5,7 +5,7 @@ import { useUser } from '@/hooks/use-user';
 import Header from '@/components/Header';
 import HabitCard from '@/components/HabitCard';
 import { generateMotivationalPrompt } from '@/ai/flows/motivational-prompt';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { useState } from 'react';
 import Confetti from './ui/Confetti';
 import { STREAK_MILESTONES } from '@/lib/constants';
@@ -13,7 +13,6 @@ import { STREAK_MILESTONES } from '@/lib/constants';
 export default function Dashboard() {
   const { user } = useUser();
   const { habits, checkIn } = useHabits();
-  const { toast } = useToast();
   const [showConfetti, setShowConfetti] = useState(false);
   const [confettiKey, setConfettiKey] = useState(0);
 
@@ -26,18 +25,20 @@ export default function Dashboard() {
         setTimeout(() => setShowConfetti(false), 4000);
       }
       
-      try {
-        const res = await generateMotivationalPrompt({
-          habit: updatedHabit.name,
-          streak: updatedHabit.currentStreak,
-        });
-        toast({
-          title: 'Way to go! ✨',
-          description: res.prompt,
-        });
-      } catch (error) {
-        console.error('AI prompt failed:', error);
-        // Silently fail on AI error to not disrupt user experience
+      if (user?.settings.enableMotivation) {
+        try {
+          const res = await generateMotivationalPrompt({
+            habit: updatedHabit.name,
+            streak: updatedHabit.currentStreak,
+            coachingStyle: user.settings.coachingStyle,
+          });
+          toast.success('Way to go! ✨', {
+            description: res.prompt,
+          });
+        } catch (error) {
+          console.error('AI prompt failed:', error);
+          // Silently fail on AI error to not disrupt user experience
+        }
       }
     }
   };
