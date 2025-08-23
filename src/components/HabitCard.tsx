@@ -4,10 +4,11 @@ import type { Habit } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { Check, Share2 } from 'lucide-react';
+import { Check, Share2, Mail, MessageSquare } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { STREAK_MILESTONES } from '@/lib/constants';
 import { useToast } from '@/hooks/use-toast';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
 type HabitCardProps = {
   habit: Habit;
@@ -22,8 +23,9 @@ export default function HabitCard({ habit, onCheckIn }: HabitCardProps) {
   const nextMilestone = STREAK_MILESTONES.find(m => m > habit.currentStreak) || STREAK_MILESTONES[STREAK_MILESTONES.length - 1];
   const progressPercentage = habit.currentStreak > 0 ? (habit.currentStreak / nextMilestone) * 100 : 0;
   
-  const handleShare = async () => {
-    const shareText = `I've hit a ${habit.currentStreak}-day streak for "${habit.name}"! Let's build habits together with #StreakSpark`;
+  const shareText = `I've hit a ${habit.currentStreak}-day streak for "${habit.name}"! Let's build habits together with #StreakSpark`;
+
+  const handleNativeShare = async () => {
     if (navigator.share) {
       try {
         await navigator.share({
@@ -37,20 +39,36 @@ export default function HabitCard({ habit, onCheckIn }: HabitCardProps) {
         console.log('Share action was cancelled or failed.');
       }
     } else {
-      try {
-        await navigator.clipboard.writeText(shareText);
-        toast({
-          title: 'Copied to clipboard!',
-          description: 'You can now share your streak with your friends.',
-        });
-      } catch (err) {
-        toast({
-          variant: 'destructive',
-          title: 'Oops!',
-          description: 'Could not copy to clipboard. Please try again.',
-        });
-      }
+      handleCopyToClipboard();
     }
+  };
+
+  const handleCopyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(shareText);
+      toast({
+        title: 'Copied to clipboard!',
+        description: 'You can now share your streak with your friends.',
+      });
+    } catch (err) {
+      toast({
+        variant: 'destructive',
+        title: 'Oops!',
+        description: 'Could not copy to clipboard. Please try again.',
+      });
+    }
+  };
+  
+  const handleShareToWhatsapp = () => {
+    const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText + ' ' + window.location.href)}`;
+    window.open(whatsappUrl, '_blank');
+  };
+  
+  const handleShareToEmail = () => {
+    const emailSubject = 'My StreakSpark Progress!';
+    const emailBody = `${shareText}\n\nCheck out the app: ${window.location.href}`;
+    const mailtoUrl = `mailto:?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
+    window.location.href = mailtoUrl;
   };
 
   return (
@@ -88,9 +106,27 @@ export default function HabitCard({ habit, onCheckIn }: HabitCardProps) {
           <Check className={cn('mr-2 h-5 w-5 transition-transform duration-300', isCheckedIn && 'scale-125')}/>
           {isCheckedIn ? 'Completed Today!' : 'Check-in'}
         </Button>
-        <Button size="lg" variant="outline" onClick={handleShare}>
-          <Share2 className="h-5 w-5" />
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button size="lg" variant="outline">
+              <Share2 className="h-5 w-5" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={handleNativeShare}>
+              <Share2 className="mr-2 h-4 w-4" />
+              <span>Share now</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleShareToWhatsapp}>
+              <MessageSquare className="mr-2 h-4 w-4" />
+              <span>Share to WhatsApp</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleShareToEmail}>
+              <Mail className="mr-2 h-4 w-4" />
+              <span>Share via Email</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </CardFooter>
     </Card>
   );
