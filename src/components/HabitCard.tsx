@@ -13,6 +13,7 @@ import { getXpForCurrentLevel, getXpForNextLevel } from '@/lib/game-mechanics';
 import { useState } from 'react';
 import AudioJournalPlayer from './AudioJournalPlayer';
 import AudioMeditationPlayer from './AudioMeditationPlayer';
+import { WhatsAppIcon } from './ui/icons';
 
 type HabitCardProps = {
   habit: Habit;
@@ -50,6 +51,12 @@ export default function HabitCard({ habit, onCheckIn }: HabitCardProps) {
         description: 'Could not copy to clipboard. Please try again.',
       });
     }
+  };
+
+  const handleShareToWhatsApp = () => {
+    const encodedText = encodeURIComponent(shareText);
+    const whatsappUrl = `https://wa.me/?text=${encodedText}`;
+    window.open(whatsappUrl, '_blank');
   };
 
   const handleCheckInClick = () => {
@@ -138,6 +145,10 @@ export default function HabitCard({ habit, onCheckIn }: HabitCardProps) {
             <DropdownMenuItem onClick={handleCopyToClipboard}>
               <Copy className="mr-2 h-4 w-4" />
               <span>Copy Share Text</span>
+            </DropdownMenuItem>
+             <DropdownMenuItem onClick={handleShareToWhatsApp}>
+              <WhatsAppIcon className="mr-2 h-4 w-4" />
+              <span>Share to WhatsApp</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
