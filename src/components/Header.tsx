@@ -11,9 +11,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { useHabits } from '@/hooks/use-habits';
 
 export default function Header() {
-  const { user } = useUser();
+  const { user, clearUser } = useUser();
+  const { clearHabits } = useHabits();
+
+  const handleLogout = () => {
+    clearUser();
+    clearHabits();
+  };
 
   return (
     <header className="flex justify-between items-center w-full">
@@ -40,7 +47,7 @@ export default function Header() {
             <DropdownMenuItem>
               Settings
             </DropdownMenuItem>
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={handleLogout}>
               Log out
             </DropdownMenuItem>
           </DropdownMenuContent>

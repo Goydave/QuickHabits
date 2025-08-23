@@ -38,6 +38,15 @@ export function useHabits() {
       console.error("Failed to save habits to local storage", error);
     }
   }, []);
+
+  const clearHabits = useCallback(() => {
+    try {
+      localStorage.removeItem(HABITS_STORAGE_KEY);
+      setHabitsState([]);
+    } catch (error) {
+      console.error("Failed to clear habits from local storage", error);
+    }
+  }, []);
   
   const checkIn = useCallback((habitId: string): Habit | undefined => {
     const today = new Date();
@@ -73,5 +82,5 @@ export function useHabits() {
     return updatedHabit;
   }, [habits, setHabits]);
 
-  return { habits, setHabits, checkIn, isLoading };
+  return { habits, setHabits, checkIn, isLoading, clearHabits };
 }

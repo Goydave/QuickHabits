@@ -34,5 +34,14 @@ export function useUser() {
     }
   }, []);
 
-  return { user, setUser, isLoading };
+  const clearUser = useCallback(() => {
+    try {
+      localStorage.removeItem(USER_STORAGE_KEY);
+      setUserState(null);
+    } catch (error) {
+      console.error("Failed to clear user from local storage", error);
+    }
+  }, []);
+
+  return { user, setUser, isLoading, clearUser };
 }
