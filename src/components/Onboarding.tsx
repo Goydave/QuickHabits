@@ -12,7 +12,7 @@ import { Label } from '@/components/ui/label';
 import Logo from './ui/Logo';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import HabitSelector from './HabitSelector';
+import HabitCoach from './HabitCoach';
 
 export default function Onboarding() {
   const { setUser } = useUser();
@@ -20,7 +20,6 @@ export default function Onboarding() {
   const router = useRouter();
   const [step, setStep] = useState(1);
   const [nickname, setNickname] = useState('');
-  const [selectedHabits, setSelectedHabits] = useState<PredefinedHabit[]>([]);
 
   const handleNextStep = () => {
     if (nickname.trim()) {
@@ -29,17 +28,19 @@ export default function Onboarding() {
     }
   };
 
-  const handleStartJourney = () => {
-    if (selectedHabits.length === 0) {
-      // Maybe show a toast? For now, we just prevent empty state.
+  const handleStartJourney = (selectedHabitIds: string[]) => {
+    if (selectedHabitIds.length === 0) {
       return;
     }
-    const newHabits: Habit[] = selectedHabits.map(h => ({
-      ...h,
-      currentStreak: 0,
-      longestStreak: 0,
-      lastCheckinDate: null,
-    }));
+    const newHabits: Habit[] = PREDEFINED_HABITS
+        .filter(h => selectedHabitIds.includes(h.id))
+        .map(h => ({
+            ...h,
+            currentStreak: 0,
+            longestStreak: 0,
+            lastCheckinDate: null,
+        }));
+
     setHabits(newHabits);
     router.push('/');
   };
@@ -59,7 +60,7 @@ export default function Onboarding() {
             >
               <CardHeader>
                 <CardTitle className="font-headline text-2xl">Welcome to QuickHabits!</CardTitle>
-                <CardDescription>What should we call you?</CardDescription>
+                <CardDescription>First, what should we call you?</CardDescription>
               </CardHeader>
               <CardContent>
                 <form onSubmit={(e) => { e.preventDefault(); handleNextStep(); }}>
@@ -90,21 +91,14 @@ export default function Onboarding() {
               transition={{ duration: 0.3 }}
             >
               <CardHeader>
-                <CardTitle className="font-headline text-2xl">Choose Your Habits</CardTitle>
-                <CardDescription>Select the habits you want to track. You can change these later.</CardDescription>
+                <CardTitle className="font-headline text-2xl">Meet Your AI Coach</CardTitle>
+                <CardDescription>Tell your coach a goal, and they'll create a habit plan for you.</CardDescription>
               </CardHeader>
               <CardContent>
-                <HabitSelector
-                  predefinedHabits={PREDEFINED_HABITS}
-                  selectedHabits={selectedHabits}
-                  onSelectionChange={setSelectedHabits}
-                />
+                <HabitCoach onPlanReady={handleStartJourney} />
               </CardContent>
-              <CardFooter className="flex-col gap-2">
-                 <Button className="w-full" onClick={handleStartJourney} disabled={selectedHabits.length === 0}>
-                   Start My Journey!
-                 </Button>
-                 <Button variant="ghost" className="w-full" onClick={() => setStep(1)}>
+               <CardFooter>
+                  <Button variant="ghost" className="w-full" onClick={() => setStep(1)}>
                     Back
                  </Button>
               </CardFooter>
