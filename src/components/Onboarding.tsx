@@ -11,13 +11,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import Logo from './ui/Logo';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useRouter } from 'next/navigation';
 import HabitCoach from './HabitCoach';
 
 export default function Onboarding() {
   const { setUser } = useUser();
   const { setHabits } = useHabits();
-  const router = useRouter();
   const [step, setStep] = useState(1);
   const [nickname, setNickname] = useState('');
 
@@ -43,7 +41,9 @@ export default function Onboarding() {
         }));
 
     setHabits(newHabits);
-    router.push('/');
+    // Force a full page reload to ensure the new state is recognized
+    // and the user is redirected to the dashboard correctly.
+    window.location.href = '/';
   };
 
   return (
