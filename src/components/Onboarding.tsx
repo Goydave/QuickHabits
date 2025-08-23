@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -12,6 +13,7 @@ import { Label } from '@/components/ui/label';
 import Logo from './ui/Logo';
 import { motion, AnimatePresence } from 'framer-motion';
 import HabitCoach from './HabitCoach';
+import ManualHabitSelector from './ManualHabitSelector';
 
 export default function Onboarding() {
   const { setUser } = useUser();
@@ -23,7 +25,11 @@ export default function Onboarding() {
     e.preventDefault();
     if (nickname.trim()) {
       setUser({ nickname });
-      setStep(2);
+      if (navigator.onLine) {
+        setStep(2); // AI Coach step
+      } else {
+        setStep(3); // Offline manual selection step
+      }
     }
   };
 
@@ -97,6 +103,29 @@ export default function Onboarding() {
               </CardHeader>
               <CardContent>
                 <HabitCoach onPlanReady={handleStartJourney} />
+              </CardContent>
+               <CardFooter>
+                  <Button variant="ghost" className="w-full" onClick={() => setStep(1)}>
+                    Back
+                 </Button>
+              </CardFooter>
+            </motion.div>
+          )}
+
+          {step === 3 && (
+             <motion.div
+              key="step3"
+              initial={{ opacity: 0, x: -50 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 50 }}
+              transition={{ duration: 0.3 }}
+            >
+              <CardHeader>
+                <CardTitle className="font-headline text-2xl">Choose Your Habits</CardTitle>
+                <CardDescription>Select the habits you want to track. You can change these later in settings.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ManualHabitSelector onPlanReady={handleStartJourney} />
               </CardContent>
                <CardFooter>
                   <Button variant="ghost" className="w-full" onClick={() => setStep(1)}>
