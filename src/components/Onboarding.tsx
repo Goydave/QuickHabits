@@ -12,12 +12,14 @@ import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 import Logo from './ui/Logo';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 
 const MAX_HABITS = 3;
 
 export default function Onboarding() {
   const { setUser } = useUser();
   const { setHabits } = useHabits();
+  const router = useRouter();
   const [step, setStep] = useState(1);
   const [nickname, setNickname] = useState('');
   const [selectedHabits, setSelectedHabits] = useState<PredefinedHabit[]>([]);
@@ -37,6 +39,7 @@ export default function Onboarding() {
   const handleStart = () => {
     setUser({ nickname });
     setHabits(selectedHabits.map(h => ({ ...h, currentStreak: 0, longestStreak: 0, lastCheckinDate: null })));
+    router.push('/');
   };
 
   return (
