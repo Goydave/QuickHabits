@@ -1,0 +1,69 @@
+'use client';
+
+import { useHabits } from '@/hooks/use-habits';
+import { useUser } from '@/hooks/use-user';
+import Header from '@/components/Header';
+import HabitCard from '@/components/HabitCard';
+import { generateMotivationalPrompt } from '@/ai/flows/motivational-prompt';
+import { useToast } from '@/hooks/use-toast';
+import { useState } from 'react';
+import Confetti from './ui/Confetti';
+import { STREAK_MILESTONES } from '@/lib/constants';
+
+export default function Dashboard() {
+  const { user } = useUser();
+  const { habits, checkIn } = useHabits();
+  const { toast } = useToast();
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [confettiKey, setConfettiKey] = useState(0);
+
+  const handleCheckIn = async (habitId: string) => {
+    const updatedHabit = checkIn(habitId);
+    if (updatedHabit) {
+      if (STREAK_MILESTONES.includes(updatedHabit.currentStreak)) {
+        setShowConfetti(true);
+        setConfettiKey(prev => prev + 1);
+        setTimeout(() => setShowConfetti(false), 4000);
+      }
+      
+      try {
+        const res = await generateMotivationalPrompt({
+          habit: updatedHabit.name,
+          streak: updatedHabit.currentStreak,
+        });
+        toast({
+          title: 'Way to go! ✨',
+          description: res.prompt,
+        });
+      } catch (error) {
+        console.error('AI prompt failed:', error);
+        // Silently fail on AI error to not disrupt user experience
+      }
+    }
+  };
+
+  return (
+    <div className="flex flex-col min-h-screen bg-background text-foreground p-4 md:p-6">
+      {showConfetti && <Confetti key={confettiKey} />}
+      <Header />
+      <main className="flex-grow pt-8">
+        <h1 className="text-3xl md:text-4xl font-bold font-headline text-center mb-2">
+          Hello, {user?.nickname}!
+        </h1>
+        <p className="text-center text-muted-foreground mb-8">
+          Your daily progress is looking great. Keep it up!
+        </p>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+          {habits.map((habit) => (
+            <HabitCard
+              key={habit.id}
+              habit={habit}
+              onCheckIn={() => handleCheckIn(habit.id)}
+            />
+          ))}
+        </div>
+      </main>
+    </div>
+  );
+}

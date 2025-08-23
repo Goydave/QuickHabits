@@ -1,0 +1,77 @@
+'use client';
+
+import { useState, useEffect, useCallback } from 'react';
+import type { Habit } from '@/lib/types';
+import { PREDEFINED_HABITS } from '@/lib/constants';
+
+const HABITS_STORAGE_KEY = 'streakspark-habits';
+
+export function useHabits() {
+  const [habits, setHabitsState] = useState<Habit[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    try {
+      const storedHabits = localStorage.getItem(HABITS_STORAGE_KEY);
+      if (storedHabits) {
+        const parsedHabits: Habit[] = JSON.parse(storedHabits);
+        // Re-hydrate icon components
+        const habitsWithIcons = parsedHabits.map(habit => {
+            const predefined = PREDEFINED_HABITS.find(p => p.id === habit.id);
+            return { ...habit, icon: predefined ? predefined.icon : () => null };
+        });
+        setHabitsState(habitsWithIcons);
+      }
+    } catch (error) {
+      console.error("Failed to load habits from local storage", error);
+    }
+    setIsLoading(false);
+  }, []);
+
+  const setHabits = useCallback((newHabits: Habit[]) => {
+    try {
+      // Don't store component functions in local storage
+      const storableHabits = newHabits.map(({ icon, ...rest }) => rest);
+      localStorage.setItem(HABITS_STORAGE_KEY, JSON.stringify(storableHabits));
+      setHabitsState(newHabits);
+    } catch (error) {
+      console.error("Failed to save habits to local storage", error);
+    }
+  }, []);
+  
+  const checkIn = useCallback((habitId: string): Habit | undefined => {
+    const today = new Date();
+    const todayStr = today.toISOString().split('T')[0];
+    
+    let updatedHabit: Habit | undefined;
+
+    const newHabits = habits.map((habit) => {
+      if (habit.id === habitId) {
+        if (habit.lastCheckinDate === todayStr) return habit; // Already checked in
+
+        const yesterday = new Date(today);
+        yesterday.setDate(today.getDate() - 1);
+        const yesterdayStr = yesterday.toISOString().split('T')[0];
+
+        let newStreak = 1;
+        if (habit.lastCheckinDate === yesterdayStr) {
+          newStreak = habit.currentStreak + 1;
+        }
+
+        updatedHabit = {
+          ...habit,
+          currentStreak: newStreak,
+          longestStreak: Math.max(habit.longestStreak, newStreak),
+          lastCheckinDate: todayStr,
+        };
+        return updatedHabit;
+      }
+      return habit;
+    });
+
+    setHabits(newHabits);
+    return updatedHabit;
+  }, [habits, setHabits]);
+
+  return { habits, setHabits, checkIn, isLoading };
+}
