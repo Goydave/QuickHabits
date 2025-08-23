@@ -4,7 +4,7 @@
   "description": "Build habits, quickly.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#000000",
+  "background_color": "#18181b",
   "theme_color": "#FFC107",
   "icons": [
     {
@@ -22,23 +22,23 @@
     {
       "name": "Daily Focus",
       "short_name": "Focus",
-      "description": "View your daily focus quest.",
-      "url": "/",
-      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
+      "description": "View your AI-generated daily focus",
+      "url": "/?action=focus",
+      "icons": [{ "src": "/icons/shortcut-focus.png", "sizes": "192x192" }]
     },
     {
-      "name": "Journal Prompt",
+      "name": "Audio Journal",
       "short_name": "Journal",
-      "description": "Get a new audio journaling prompt.",
+      "description": "Start a new audio journal entry",
       "url": "/?action=journal",
-      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
+      "icons": [{ "src": "/icons/shortcut-journal.png", "sizes": "192x192" }]
     },
     {
       "name": "Guided Meditation",
       "short_name": "Meditate",
-      "description": "Start a new guided meditation session.",
+      "description": "Start a guided meditation session",
       "url": "/?action=meditate",
-      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
+      "icons": [{ "src": "/icons/shortcut-meditate.png", "sizes": "192x192" }]
     }
   ]
 }
