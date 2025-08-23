@@ -25,7 +25,10 @@ export default function DailyFocus({ habits }: DailyFocusProps) {
     } else {
       const activeHabits = habits.filter(h => !h.isArchived);
       if (activeHabits.length > 0) {
-        generateDailyFocus({ habits: activeHabits })
+        // Sanitize habits to remove non-serializable icon component before sending to server
+        const serializableHabits = activeHabits.map(({ icon, ...rest }) => rest);
+
+        generateDailyFocus({ habits: serializableHabits })
           .then(result => {
             setFocus(result);
             localStorage.setItem('dailyFocus', JSON.stringify(result));
