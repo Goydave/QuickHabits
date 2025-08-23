@@ -12,17 +12,16 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { useHabits } from '@/hooks/use-habits';
-import { useRouter } from 'next/navigation';
 
 export default function Header() {
   const { user, clearUser } = useUser();
   const { clearHabits } = useHabits();
-  const router = useRouter();
 
   const handleLogout = () => {
     clearUser();
     clearHabits();
-    router.push('/');
+    // Force a full page reload to ensure the user is redirected to the onboarding screen
+    window.location.href = '/';
   };
 
   return (
