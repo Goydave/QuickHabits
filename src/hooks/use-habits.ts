@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import type { Habit } from '@/lib/types';
+import type { Habit, PredefinedHabit } from '@/lib/types';
 import { PREDEFINED_HABITS } from '@/lib/constants';
 
 const HABITS_STORAGE_KEY = 'quickhabits-habits';
@@ -82,5 +82,24 @@ export function useHabits() {
     return updatedHabit;
   }, [habits, setHabits]);
 
-  return { habits, setHabits, checkIn, isLoading, clearHabits };
+  const addHabit = useCallback((habitId: string) => {
+    const predefinedHabit = PREDEFINED_HABITS.find(h => h.id === habitId);
+    if (!predefinedHabit || habits.some(h => h.id === habitId)) return;
+
+    const newHabit: Habit = {
+      ...predefinedHabit,
+      currentStreak: 0,
+      longestStreak: 0,
+      lastCheckinDate: null,
+    };
+    setHabits([...habits, newHabit]);
+  }, [habits, setHabits]);
+
+  const removeHabit = useCallback((habitId: string) => {
+    const newHabits = habits.filter(h => h.id !== habitId);
+    setHabits(newHabits);
+  }, [habits, setHabits]);
+
+
+  return { habits, setHabits, checkIn, isLoading, clearHabits, addHabit, removeHabit };
 }

@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { useHabits } from '@/hooks/use-habits';
+import Link from 'next/link';
 
 export default function Header() {
   const { user, clearUser } = useUser();
@@ -46,9 +47,11 @@ export default function Header() {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              Settings
-            </DropdownMenuItem>
+            <Link href="/settings" passHref>
+              <DropdownMenuItem>
+                Settings
+              </DropdownMenuItem>
+            </Link>
             <DropdownMenuItem onClick={handleLogout}>
               Log out
             </DropdownMenuItem>
