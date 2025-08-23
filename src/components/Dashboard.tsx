@@ -17,24 +17,41 @@ export default function Dashboard() {
   const [confettiKey, setConfettiKey] = useState(0);
 
   const handleCheckIn = async (habitId: string) => {
+    const originalHabit = habits.find(h => h.id === habitId);
+    if (!originalHabit) return;
+    
+    const originalLevel = originalHabit.level;
     const updatedHabit = checkIn(habitId);
+    
     if (updatedHabit) {
-      if (STREAK_MILESTONES.includes(updatedHabit.currentStreak)) {
+      const leveledUp = updatedHabit.level > originalLevel;
+
+      if (STREAK_MILESTONES.includes(updatedHabit.currentStreak) || leveledUp) {
         setShowConfetti(true);
         setConfettiKey(prev => prev + 1);
         setTimeout(() => setShowConfetti(false), 4000);
       }
       
+      if (leveledUp) {
+        toast.success(`Leveled Up!`, {
+            description: `You've reached Level ${updatedHabit.level} in "${updatedHabit.name}". Amazing!`,
+        });
+      }
+
       if (user?.settings.enableMotivation) {
         try {
           const res = await generateMotivationalPrompt({
             habit: updatedHabit.name,
             streak: updatedHabit.currentStreak,
+            level: updatedHabit.level,
             coachingStyle: user.settings.coachingStyle,
           });
-          toast.success('Way to go! ✨', {
-            description: res.prompt,
-          });
+          // Avoid showing two toasts at once if they leveled up
+          if (!leveledUp) {
+            toast.success('Way to go! ✨', {
+                description: res.prompt,
+            });
+          }
         } catch (error) {
           console.error('AI prompt failed:', error);
           // Silently fail on AI error to not disrupt user experience

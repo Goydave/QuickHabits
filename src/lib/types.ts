@@ -26,4 +26,6 @@ export type Habit = PredefinedHabit & {
   currentStreak: number;
   longestStreak: number;
   lastCheckinDate: string | null;
+  xp: number;
+  level: number;
 };

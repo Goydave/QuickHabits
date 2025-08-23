@@ -24,8 +24,8 @@ export default function Onboarding() {
   const handleNextStep = (e: React.FormEvent) => {
     e.preventDefault();
     if (nickname.trim()) {
-      setUser({ nickname });
-      if (navigator.onLine) {
+      setUser({ nickname, settings: { enableMotivation: true, coachingStyle: 'encouraging', colorTheme: 'theme-amber' } });
+      if (typeof window !== 'undefined' && navigator.onLine) {
         setStep(2); // AI Coach step
       } else {
         setStep(3); // Offline manual selection step
@@ -44,6 +44,8 @@ export default function Onboarding() {
             currentStreak: 0,
             longestStreak: 0,
             lastCheckinDate: null,
+            xp: 0,
+            level: 1,
         }));
 
     setHabits(newHabits);

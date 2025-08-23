@@ -9,11 +9,12 @@
  */
 
 import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import {z} from 'zod';
 
 const MotivationalPromptInputSchema = z.object({
   habit: z.string().describe('The habit for which to generate a motivational prompt.'),
   streak: z.number().describe('The current streak for the habit.'),
+  level: z.number().describe('The current level for the habit.'),
   coachingStyle: z.enum(['encouraging', 'tough-love', 'zen']).default('encouraging').describe('The desired coaching style for the message.'),
 });
 export type MotivationalPromptInput = z.infer<typeof MotivationalPromptInputSchema>;
@@ -41,17 +42,20 @@ const prompt = ai.definePrompt({
 
   The user's habit is: {{habit}}
   The current streak is: {{streak}} days.
+  The current level is: {{level}}.
 
-  Generate a short, encouraging motivational message (no more than 2 sentences) that is personalized to the habit, streak, and coaching style.
+  Generate a short, encouraging motivational message (no more than 2 sentences) that is personalized to the habit, streak, level, and coaching style.
 
   - If the streak is 0, encourage the user to start today.
   - If the streak is 1, congratulate them on starting.
   - If the streak is greater than 1, acknowledge their consistent effort.
+  - If the level is high (5+), acknowledge their dedication and expertise.
+  - If the level is low (1-2), encourage them on their new journey.
 
-  Example for "Drink Water", streak 3:
-  - Encouraging: "Yes! 3 days of staying hydrated in a row! You're building a fantastic habit. Keep it flowing! 💧"
-  - Tough-love: "Three days. That's a start. Don't get comfortable. True consistency is built when no one is watching. Get it done."
-  - Zen: "Three days of honoring your body with water. Notice how this simple act brings clarity. Carry this mindfulness with you today."
+  Example for "Drink Water", streak 3, level 2:
+  - Encouraging: "Yes! 3 days of staying hydrated in a row! You're already Level 2. Keep it flowing! 💧"
+  - Tough-love: "Three days. Level 2. That's a start. Don't get comfortable. True consistency is built when no one is watching. Get it done."
+  - Zen: "Three days of honoring your body with water. Notice how this simple act brings clarity. You are cultivating a garden of well-being, one sip at a time."
   `,
 });
 

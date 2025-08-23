@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import type { Habit, PredefinedHabit } from '@/lib/types';
-import { PREDEFINED_HABITS } from '@/lib/constants';
+import type { Habit } from '@/lib/types';
+import { PREDEFINED_HABITS, STREAK_MILESTONES } from '@/lib/constants';
+import { getLevelFromXp, XP_PER_CHECKIN, XP_PER_STREAK_MILESTONE } from '@/lib/game-mechanics';
 
 const HABITS_STORAGE_KEY = 'quickhabits-habits';
 
@@ -15,10 +16,15 @@ export function useHabits() {
       const storedHabits = localStorage.getItem(HABITS_STORAGE_KEY);
       if (storedHabits) {
         const parsedHabits: Habit[] = JSON.parse(storedHabits);
-        // Re-hydrate icon components
+        // Re-hydrate icon components and ensure defaults
         const habitsWithIcons = parsedHabits.map(habit => {
             const predefined = PREDEFINED_HABITS.find(p => p.id === habit.id);
-            return { ...habit, icon: predefined ? predefined.icon : () => null };
+            return { 
+              ...habit, 
+              icon: predefined ? predefined.icon : () => null,
+              xp: habit.xp || 0,
+              level: habit.level || 1,
+            };
         });
         setHabitsState(habitsWithIcons);
       }
@@ -67,11 +73,20 @@ export function useHabits() {
           newStreak = habit.currentStreak + 1;
         }
 
+        let newXp = (habit.xp || 0) + XP_PER_CHECKIN;
+        if (STREAK_MILESTONES.includes(newStreak)) {
+            newXp += XP_PER_STREAK_MILESTONE;
+        }
+
+        const newLevel = getLevelFromXp(newXp);
+        
         updatedHabit = {
           ...habit,
           currentStreak: newStreak,
           longestStreak: Math.max(habit.longestStreak, newStreak),
           lastCheckinDate: todayStr,
+          xp: newXp,
+          level: newLevel,
         };
         return updatedHabit;
       }
@@ -91,6 +106,8 @@ export function useHabits() {
       currentStreak: 0,
       longestStreak: 0,
       lastCheckinDate: null,
+      xp: 0,
+      level: 1,
     };
     setHabits([...habits, newHabit]);
   }, [habits, setHabits]);
