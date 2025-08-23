@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import { useState } from 'react';
 import Confetti from './ui/Confetti';
 import { STREAK_MILESTONES } from '@/lib/constants';
+import DailyFocus from './DailyFocus';
 
 export default function Dashboard() {
   const { user } = useUser();
@@ -67,7 +68,7 @@ export default function Dashboard() {
     <div className="flex flex-col min-h-screen bg-background text-foreground p-4 md:p-6">
       {showConfetti && <Confetti key={confettiKey} />}
       <Header />
-      <main className="flex-grow pt-8">
+      <main className="flex-grow pt-8 max-w-6xl mx-auto w-full">
         <h1 className="text-3xl md:text-4xl font-bold font-headline text-center mb-2">
           Hello, {user?.nickname}!
         </h1>
@@ -75,7 +76,11 @@ export default function Dashboard() {
           {activeHabits.length > 0 ? "Your daily progress is looking great. Keep it up!" : "You have no active habits. Go to settings to add some!"}
         </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+        <div className="mb-8">
+          <DailyFocus habits={habits} />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {activeHabits.map((habit) => (
             <HabitCard
               key={habit.id}

@@ -36,3 +36,9 @@ export type Habit = PredefinedHabit & {
   level: number;
   isArchived?: boolean;
 };
+
+export type DailyFocus = {
+    headline: string;
+    prompt: string;
+    focusedHabitId: string;
+}
