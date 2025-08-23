@@ -49,7 +49,7 @@ export default function Onboarding() {
               transition={{ duration: 0.3 }}
             >
               <CardHeader>
-                <CardTitle className="font-headline text-2xl">Welcome to StreakSpark!</CardTitle>
+                <CardTitle className="font-headline text-2xl">Welcome to QuickHabits!</CardTitle>
                 <CardDescription>What should we call you?</CardDescription>
               </CardHeader>
               <CardContent>

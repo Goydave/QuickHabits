@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { User } from '@/lib/types';
 
-const USER_STORAGE_KEY = 'streakspark-user';
+const USER_STORAGE_KEY = 'quickhabits-user';
 
 export function useUser() {
   const [user, setUserState] = useState<User | null>(null);

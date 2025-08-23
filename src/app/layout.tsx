@@ -3,8 +3,8 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster"
 
 export const metadata: Metadata = {
-  title: 'StreakSpark',
-  description: 'Build habits, spark streaks.',
+  title: 'QuickHabits',
+  description: 'Build habits, quickly.',
 };
 
 export default function RootLayout({

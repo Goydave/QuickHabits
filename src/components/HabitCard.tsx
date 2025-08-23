@@ -23,13 +23,13 @@ export default function HabitCard({ habit, onCheckIn }: HabitCardProps) {
   const nextMilestone = STREAK_MILESTONES.find(m => m > habit.currentStreak) || STREAK_MILESTONES[STREAK_MILESTONES.length - 1];
   const progressPercentage = habit.currentStreak > 0 ? (habit.currentStreak / nextMilestone) * 100 : 0;
   
-  const shareText = `I've hit a ${habit.currentStreak}-day streak for "${habit.name}"! Let's build habits together with #StreakSpark`;
+  const shareText = `I've hit a ${habit.currentStreak}-day streak for "${habit.name}"! Let's build habits together with #QuickHabits`;
 
   const handleNativeShare = async () => {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: 'My StreakSpark Progress!',
+          title: 'My QuickHabits Progress!',
           text: shareText,
           url: window.location.href,
         });
@@ -65,7 +65,7 @@ export default function HabitCard({ habit, onCheckIn }: HabitCardProps) {
   };
   
   const handleShareToEmail = () => {
-    const emailSubject = 'My StreakSpark Progress!';
+    const emailSubject = 'My QuickHabits Progress!';
     const emailBody = `${shareText}\n\nCheck out the app: ${window.location.href}`;
     const mailtoUrl = `mailto:?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
     window.location.href = mailtoUrl;

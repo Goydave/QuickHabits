@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import type { Habit } from '@/lib/types';
 import { PREDEFINED_HABITS } from '@/lib/constants';
 
-const HABITS_STORAGE_KEY = 'streakspark-habits';
+const HABITS_STORAGE_KEY = 'quickhabits-habits';
 
 export function useHabits() {
   const [habits, setHabitsState] = useState<Habit[]>([]);
