@@ -20,14 +20,19 @@ export default function HabitCard({ habit, onCheckIn }: HabitCardProps) {
   const nextMilestone = STREAK_MILESTONES.find(m => m > habit.currentStreak) || STREAK_MILESTONES[STREAK_MILESTONES.length - 1];
   const progressPercentage = habit.currentStreak > 0 ? (habit.currentStreak / nextMilestone) * 100 : 0;
   
-  const handleShare = () => {
+  const handleShare = async () => {
     const shareText = `I've hit a ${habit.currentStreak}-day streak for "${habit.name}"! Let's build habits together with #StreakSpark`;
     if (navigator.share) {
-      navigator.share({
-        title: 'My StreakSpark Progress!',
-        text: shareText,
-        url: window.location.href,
-      }).catch(console.error);
+      try {
+        await navigator.share({
+          title: 'My StreakSpark Progress!',
+          text: shareText,
+          url: window.location.href,
+        });
+      } catch (error) {
+        console.error('Sharing failed:', error);
+        // Fallback or just ignore if user cancels sharing
+      }
     } else {
       navigator.clipboard.writeText(shareText);
       alert('Share link copied to clipboard!');
