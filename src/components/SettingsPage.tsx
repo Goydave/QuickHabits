@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useUser } from '@/hooks/use-user';
 import { useHabits } from '@/hooks/use-habits';
 import { Button } from '@/components/ui/button';
@@ -46,6 +46,12 @@ export default function SettingsPage() {
   const [enableMotivation, setEnableMotivation] = useState(user?.settings.enableMotivation ?? true);
   const [coachingStyle, setCoachingStyle] = useState<CoachingStyle>(user?.settings.coachingStyle ?? 'encouraging');
   const [colorTheme, setColorTheme] = useState(user?.settings.colorTheme ?? 'theme-amber');
+  
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
 
   const handleSavePreferences = () => {
      if (user) {
@@ -142,7 +148,7 @@ export default function SettingsPage() {
           </div>
           <div className="space-y-2">
             <Label>Appearance</Label>
-             <RadioGroup
+             {mounted && <RadioGroup
               defaultValue={theme}
               onValueChange={(value) => setTheme(value)}
               className="grid max-w-md grid-cols-2 gap-8 pt-2"
@@ -183,7 +189,7 @@ export default function SettingsPage() {
                   Dark
                 </span>
               </Label>
-            </RadioGroup>
+            </RadioGroup>}
           </div>
           <Button onClick={handleSavePreferences}>Save Preferences</Button>
         </CardContent>
