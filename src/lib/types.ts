@@ -18,11 +18,13 @@ export type User = {
 
 export type HabitType = 'build' | 'quit';
 
+export type SpecialAction = 'audio-journal' | 'audio-meditation';
+
 export type PredefinedHabit = {
   id: string;
   name: string;
   icon: Icon;
-  specialAction?: 'audio-journal';
+  specialAction?: SpecialAction;
   type?: HabitType;
 };
 
@@ -32,4 +34,5 @@ export type Habit = PredefinedHabit & {
   lastCheckinDate: string | null;
   xp: number;
   level: number;
+  isArchived?: boolean;
 };

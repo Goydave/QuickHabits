@@ -16,6 +16,8 @@ export default function Dashboard() {
   const [showConfetti, setShowConfetti] = useState(false);
   const [confettiKey, setConfettiKey] = useState(0);
 
+  const activeHabits = habits.filter(h => !h.isArchived);
+
   const handleCheckIn = async (habitId: string) => {
     const originalHabit = habits.find(h => h.id === habitId);
     if (!originalHabit) return;
@@ -70,11 +72,11 @@ export default function Dashboard() {
           Hello, {user?.nickname}!
         </h1>
         <p className="text-center text-muted-foreground mb-8">
-          Your daily progress is looking great. Keep it up!
+          {activeHabits.length > 0 ? "Your daily progress is looking great. Keep it up!" : "You have no active habits. Go to settings to add some!"}
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-          {habits.map((habit) => (
+          {activeHabits.map((habit) => (
             <HabitCard
               key={habit.id}
               habit={habit}

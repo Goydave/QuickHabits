@@ -11,6 +11,7 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'zod';
 import type { HabitType } from '@/lib/types';
+import { PREDEFINED_HABITS } from '@/lib/constants';
 
 const MotivationalPromptInputSchema = z.object({
   habit: z.string().describe('The habit for which to generate a motivational prompt.'),
@@ -30,10 +31,43 @@ export async function generateMotivationalPrompt(input: MotivationalPromptInput)
   return motivationalPromptFlow(input);
 }
 
+const suggestHabitTool = ai.defineTool(
+    {
+        name: 'suggestHabit',
+        description: 'Suggests a new habit for the user to try based on their current habit.',
+        inputSchema: z.object({
+            currentHabit: z.string().describe('The user\'s current habit.'),
+            allHabits: z.array(z.string()).describe('The list of all available habits.'),
+        }),
+        outputSchema: z.object({
+            suggestion: z.string().optional().describe('The suggested new habit.'),
+        }),
+    },
+    async ({ currentHabit, allHabits }) => {
+        // Simple logic: suggest a related habit. This could be improved with more sophisticated logic.
+        const relatedHabits: Record<string, string[]> = {
+            'Exercise': ['Drink Water', 'Eat Healthy'],
+            'Eat Healthy': ['Exercise', 'No Junk Food'],
+            'Read a Book': ['Learn Something', 'Meditate'],
+            'Meditate': ['Journal', 'Wake Up Early'],
+        };
+        const suggestions = relatedHabits[currentHabit];
+        if (suggestions) {
+            const availableSuggestion = suggestions.find(s => allHabits.includes(s));
+            if (availableSuggestion) {
+                return { suggestion: availableSuggestion };
+            }
+        }
+        return {};
+    }
+);
+
+
 const prompt = ai.definePrompt({
   name: 'motivationalPromptPrompt',
   input: {schema: MotivationalPromptInputSchema},
   output: {schema: MotivationalPromptOutputSchema},
+  tools: [suggestHabitTool],
   prompt: `You are a motivational coach. Your goal is to encourage the user to continue their habit.
 
   Your coaching style should be: {{coachingStyle}}.
@@ -58,6 +92,8 @@ const prompt = ai.definePrompt({
   - If the level is high (5+), acknowledge their dedication and expertise.
   - If the level is low (1-2), encourage them on their new journey.
 
+  If the user is doing well (streak > 5 or level > 3), you can use the suggestHabit tool to recommend a new complementary habit. If you do, incorporate the suggestion naturally into your message. For example: "You're doing amazing with Exercise! Maybe it's a good time to add 'Drink Water' to your routine?"
+
   Example for 'build' habit "Drink Water", streak 3, level 2:
   - Encouraging: "Yes! 3 days of staying hydrated in a row! You're already Level 2. Keep it flowing! 💧"
   - Tough-love: "Three days. Level 2. That's a start. Don't get comfortable. True consistency is built when no one is watching. Get it done."
@@ -77,7 +113,13 @@ const motivationalPromptFlow = ai.defineFlow(
     outputSchema: MotivationalPromptOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
+    const allHabitNames = PREDEFINED_HABITS.map(h => h.name);
+    const {output} = await prompt(input, {
+        context: {
+            allHabits: allHabitNames,
+            currentHabit: input.habit
+        }
+    });
     return output!;
   }
 );

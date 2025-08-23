@@ -25,6 +25,7 @@ export function useHabits() {
               type: predefined ? predefined.type : 'build',
               xp: habit.xp || 0,
               level: habit.level || 1,
+              isArchived: habit.isArchived || false,
             };
         });
         setHabitsState(habitsWithIcons);
@@ -109,6 +110,7 @@ export function useHabits() {
       lastCheckinDate: null,
       xp: 0,
       level: 1,
+      isArchived: false,
     };
     setHabits([...habits, newHabit]);
   }, [habits, setHabits]);
@@ -117,7 +119,17 @@ export function useHabits() {
     const newHabits = habits.filter(h => h.id !== habitId);
     setHabits(newHabits);
   }, [habits, setHabits]);
+  
+  const toggleHabitArchive = useCallback((habitId: string) => {
+    const newHabits = habits.map(habit => {
+        if (habit.id === habitId) {
+            return { ...habit, isArchived: !habit.isArchived };
+        }
+        return habit;
+    });
+    setHabits(newHabits);
+  }, [habits, setHabits]);
 
 
-  return { habits, setHabits, checkIn, isLoading, clearHabits, addHabit, removeHabit };
+  return { habits, setHabits, checkIn, isLoading, clearHabits, addHabit, removeHabit, toggleHabitArchive };
 }

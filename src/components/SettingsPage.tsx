@@ -21,13 +21,14 @@ import {
 import { toast } from 'sonner';
 import { PREDEFINED_HABITS } from '@/lib/constants';
 import HabitSelector from './HabitSelector';
-import type { PredefinedHabit } from '@/lib/types';
+import type { Habit, PredefinedHabit } from '@/lib/types';
 import { useTheme } from 'next-themes';
 import { RadioGroup, RadioGroupItem } from './ui/radio-group';
 import { Switch } from './ui/switch';
-import { Check, Palette, Moon, Sun } from 'lucide-react';
+import { Check, Palette, Archive, ArchiveRestore } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { CoachingStyle } from '@/lib/types';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const colorThemes = [
   { name: 'Amber', class: 'theme-amber' },
@@ -38,22 +39,14 @@ const colorThemes = [
 
 export default function SettingsPage() {
   const { user, setUser } = useUser();
-  const { habits, addHabit, removeHabit, clearHabits } = useHabits();
+  const { habits, addHabit, removeHabit, clearHabits, toggleHabitArchive } = useHabits();
   const { theme, setTheme } = useTheme();
 
-  // Local state for form elements
   const [nickname, setNickname] = useState(user?.nickname || '');
   const [enableMotivation, setEnableMotivation] = useState(user?.settings.enableMotivation ?? true);
   const [coachingStyle, setCoachingStyle] = useState<CoachingStyle>(user?.settings.coachingStyle ?? 'encouraging');
   const [colorTheme, setColorTheme] = useState(user?.settings.colorTheme ?? 'theme-amber');
 
-  const handleSaveProfile = () => {
-    if (nickname.trim() && user) {
-      setUser({ ...user, nickname: nickname.trim() });
-      toast.success('Nickname updated successfully!');
-    }
-  };
-  
   const handleSavePreferences = () => {
      if (user) {
       const newSettings = {
@@ -63,7 +56,12 @@ export default function SettingsPage() {
         colorTheme,
       };
       setUser({ ...user, settings: newSettings });
-      document.body.className = colorTheme; // Apply theme class
+      // Apply theme class to body. This is a bit of a hack, but it works for now.
+      document.body.className = '';
+      colorThemes.forEach(t => document.body.classList.remove(t.class));
+      if (theme) document.body.classList.add(theme)
+      document.body.classList.add(colorTheme);
+
       toast.success('Preferences saved!');
     }
   };
@@ -90,6 +88,9 @@ export default function SettingsPage() {
     habits.some(h => h.id === ph.id)
   );
 
+  const activeHabits = habits.filter(h => !h.isArchived);
+  const archivedHabits = habits.filter(h => h.isArchived);
+
   return (
     <div className="space-y-8">
       <Card>
@@ -106,7 +107,7 @@ export default function SettingsPage() {
                 value={nickname}
                 onChange={(e) => setNickname(e.target.value)}
               />
-              <Button onClick={handleSaveProfile} disabled={nickname === user?.nickname || !nickname.trim()}>
+              <Button onClick={() => user && setUser({ ...user, nickname })} disabled={nickname === user?.nickname || !nickname.trim()}>
                 Save
               </Button>
             </div>
@@ -244,14 +245,57 @@ export default function SettingsPage() {
       <Card>
         <CardHeader>
           <CardTitle>Manage Habits</CardTitle>
-          <CardDescription>Add or remove habits from your daily tracking.</CardDescription>
+          <CardDescription>Add, remove, or archive your habits.</CardDescription>
         </CardHeader>
         <CardContent>
-          <HabitSelector
-            predefinedHabits={PREDEFINED_HABITS}
-            selectedHabits={selectedPredefinedHabits}
-            onSelectionChange={handleHabitSelectionChange}
-          />
+            <Tabs defaultValue="active">
+                <TabsList className='mb-4'>
+                    <TabsTrigger value="active">Active ({activeHabits.length})</TabsTrigger>
+                    <TabsTrigger value="archived">Archived ({archivedHabits.length})</TabsTrigger>
+                    <TabsTrigger value="add">Add New</TabsTrigger>
+                </TabsList>
+                <TabsContent value="active">
+                    {activeHabits.length > 0 ? (
+                        <div className="space-y-2">
+                            {activeHabits.map(habit => (
+                                <div key={habit.id} className="flex items-center justify-between rounded-lg border p-3">
+                                    <div className="flex items-center gap-3">
+                                        <habit.icon className="w-5 h-5 text-primary" />
+                                        <span className="font-medium">{habit.name}</span>
+                                    </div>
+                                    <Button variant="ghost" size="icon" onClick={() => toggleHabitArchive(habit.id)}>
+                                        <Archive className="w-5 h-5" />
+                                    </Button>
+                                </div>
+                            ))}
+                        </div>
+                    ) : <p className="text-muted-foreground text-center">No active habits.</p>}
+                </TabsContent>
+                <TabsContent value="archived">
+                    {archivedHabits.length > 0 ? (
+                        <div className="space-y-2">
+                            {archivedHabits.map(habit => (
+                                <div key={habit.id} className="flex items-center justify-between rounded-lg border p-3">
+                                    <div className="flex items-center gap-3">
+                                        <habit.icon className="w-5 h-5 text-muted-foreground" />
+                                        <span className="font-medium text-muted-foreground">{habit.name}</span>
+                                    </div>
+                                    <Button variant="ghost" size="icon" onClick={() => toggleHabitArchive(habit.id)}>
+                                        <ArchiveRestore className="w-5 h-5" />
+                                    </Button>
+                                </div>
+                            ))}
+                        </div>
+                    ) : <p className="text-muted-foreground text-center">No archived habits.</p>}
+                </TabsContent>
+                <TabsContent value="add">
+                     <HabitSelector
+                        predefinedHabits={PREDEFINED_HABITS}
+                        selectedHabits={selectedPredefinedHabits}
+                        onSelectionChange={handleHabitSelectionChange}
+                    />
+                </TabsContent>
+            </Tabs>
         </CardContent>
       </Card>
       

@@ -12,6 +12,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { getXpForCurrentLevel, getXpForNextLevel } from '@/lib/game-mechanics';
 import { useState } from 'react';
 import AudioJournalPlayer from './AudioJournalPlayer';
+import AudioMeditationPlayer from './AudioMeditationPlayer';
 
 type HabitCardProps = {
   habit: Habit;
@@ -25,6 +26,7 @@ export default function HabitCard({ habit, onCheckIn }: HabitCardProps) {
   const habitType = habit.type || 'build';
 
   const [isAudioPlayerOpen, setIsAudioPlayerOpen] = useState(false);
+  const [isMeditationPlayerOpen, setIsMeditationPlayerOpen] = useState(false);
 
   const currentLevelXp = getXpForCurrentLevel(habit.level);
   const nextLevelXp = getXpForNextLevel(habit.level);
@@ -53,6 +55,8 @@ export default function HabitCard({ habit, onCheckIn }: HabitCardProps) {
   const handleCheckInClick = () => {
     if (habit.specialAction === 'audio-journal') {
       setIsAudioPlayerOpen(true);
+    } else if (habit.specialAction === 'audio-meditation') {
+      setIsMeditationPlayerOpen(true);
     } else {
       onCheckIn(habit.id);
     }
@@ -61,6 +65,11 @@ export default function HabitCard({ habit, onCheckIn }: HabitCardProps) {
   const handleAudioJournalComplete = () => {
     onCheckIn(habit.id);
     setIsAudioPlayerOpen(false);
+  }
+
+  const handleAudioMeditationComplete = () => {
+    onCheckIn(habit.id);
+    setIsMeditationPlayerOpen(false);
   }
   
   const checkInText = habitType === 'quit' ? "I Succeeded!" : "Check-in";
@@ -75,6 +84,13 @@ export default function HabitCard({ habit, onCheckIn }: HabitCardProps) {
           onComplete={handleAudioJournalComplete}
         />
       )}
+       {habit.specialAction === 'audio-meditation' && (
+        <AudioMeditationPlayer
+          isOpen={isMeditationPlayerOpen}
+          onOpenChange={setIsMeditationPlayerOpen}
+          onComplete={handleAudioMeditationComplete}
+        />
+       )}
     <Card className={cn(
       'flex flex-col transition-all duration-300 transform hover:scale-105 hover:shadow-xl',
       isCheckedIn ? 'bg-primary/20 border-primary' : 'bg-card'
