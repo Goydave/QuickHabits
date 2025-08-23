@@ -22,6 +22,7 @@ export function useHabits() {
             return { 
               ...habit, 
               icon: predefined ? predefined.icon : () => null,
+              type: predefined ? predefined.type : 'build',
               xp: habit.xp || 0,
               level: habit.level || 1,
             };

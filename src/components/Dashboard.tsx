@@ -45,6 +45,7 @@ export default function Dashboard() {
             streak: updatedHabit.currentStreak,
             level: updatedHabit.level,
             coachingStyle: user.settings.coachingStyle,
+            habitType: updatedHabit.type || 'build',
           });
           // Avoid showing two toasts at once if they leveled up
           if (!leveledUp) {

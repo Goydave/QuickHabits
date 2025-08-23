@@ -16,11 +16,14 @@ export type User = {
   settings: UserSettings;
 };
 
+export type HabitType = 'build' | 'quit';
+
 export type PredefinedHabit = {
   id: string;
   name: string;
   icon: Icon;
   specialAction?: 'audio-journal';
+  type?: HabitType;
 };
 
 export type Habit = PredefinedHabit & {

@@ -22,6 +22,7 @@ export default function HabitCard({ habit, onCheckIn }: HabitCardProps) {
   const { toast } = useToast();
   const today = new Date().toISOString().split('T')[0];
   const isCheckedIn = habit.lastCheckinDate === today;
+  const habitType = habit.type || 'build';
 
   const [isAudioPlayerOpen, setIsAudioPlayerOpen] = useState(false);
 
@@ -61,6 +62,9 @@ export default function HabitCard({ habit, onCheckIn }: HabitCardProps) {
     onCheckIn(habit.id);
     setIsAudioPlayerOpen(false);
   }
+  
+  const checkInText = habitType === 'quit' ? "I Succeeded!" : "Check-in";
+  const completedText = habitType === 'quit' ? "Success Today!" : "Completed Today!";
 
   return (
     <>
@@ -106,7 +110,7 @@ export default function HabitCard({ habit, onCheckIn }: HabitCardProps) {
           variant={isCheckedIn ? 'secondary' : 'default'}
         >
           <Check className={cn('mr-2 h-5 w-5 transition-transform duration-300', isCheckedIn && 'scale-125')}/>
-          {isCheckedIn ? 'Completed Today!' : 'Check-in'}
+          {isCheckedIn ? completedText : checkInText}
         </Button>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
