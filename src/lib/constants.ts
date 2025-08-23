@@ -1,4 +1,4 @@
-import { GlassWater, Dumbbell, BookOpen, BrainCircuit, Sunrise, Salad, Ban, Lightbulb, PenSquare } from 'lucide-react';
+import { GlassWater, Dumbbell, BookOpen, BrainCircuit, Sunrise, Salad, Ban, Lightbulb, PenSquare, ListTodo, BeerOff, Sparkles, Wand, Footprints } from 'lucide-react';
 import type { PredefinedHabit } from './types';
 
 export const PREDEFINED_HABITS: PredefinedHabit[] = [
@@ -11,6 +11,11 @@ export const PREDEFINED_HABITS: PredefinedHabit[] = [
   { id: 'no-junk-food', name: 'No Junk Food', icon: Ban, type: 'quit' },
   { id: 'learn-something', name: 'Learn Something', icon: Lightbulb, type: 'build' },
   { id: 'journal', name: 'Journal', icon: PenSquare, specialAction: 'audio-journal', type: 'build' },
+  { id: 'plan-day', name: 'Plan Your Day', icon: ListTodo, type: 'build' },
+  { id: 'no-alcohol', name: 'No Alcohol', icon: BeerOff, type: 'quit' },
+  { id: 'tidy-up', name: 'Tidy Up', icon: Sparkles, type: 'build' },
+  { id: 'practice-skill', name: 'Practice a Skill', icon: Wand, type: 'build' },
+  { id: 'go-for-walk', name: 'Go for a Walk', icon: Footprints, type: 'build' },
 ];
 
 export const STREAK_MILESTONES = [3, 7, 14, 30, 60, 100, 365];
