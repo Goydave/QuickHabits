@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useUser } from '@/hooks/use-user';
 import { useHabits } from '@/hooks/use-habits';
 import { PREDEFINED_HABITS } from '@/lib/constants';
-import type { Habit, PredefinedHabit } from '@/lib/types';
+import type { Habit } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,7 +21,8 @@ export default function Onboarding() {
   const [step, setStep] = useState(1);
   const [nickname, setNickname] = useState('');
 
-  const handleNextStep = () => {
+  const handleNextStep = (e: React.FormEvent) => {
+    e.preventDefault();
     if (nickname.trim()) {
       setUser({ nickname });
       setStep(2);
@@ -63,7 +64,7 @@ export default function Onboarding() {
                 <CardDescription>First, what should we call you?</CardDescription>
               </CardHeader>
               <CardContent>
-                <form onSubmit={(e) => { e.preventDefault(); handleNextStep(); }}>
+                <form onSubmit={handleNextStep}>
                   <Label htmlFor="nickname" className="sr-only">Nickname</Label>
                   <Input
                     id="nickname"
