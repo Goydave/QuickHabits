@@ -52,25 +52,27 @@ export default function SettingsPage() {
     setMounted(true);
   }, []);
 
-
   const handleSavePreferences = () => {
      if (user) {
-      const newSettings = {
-        ...user.settings,
-        enableMotivation,
-        coachingStyle,
-        colorTheme,
-      };
-      setUser({ ...user, settings: newSettings });
-      // Apply theme class to body. This is a bit of a hack, but it works for now.
-      document.body.className = '';
-      colorThemes.forEach(t => document.body.classList.remove(t.class));
-      if (theme) document.body.classList.add(theme)
-      document.body.classList.add(colorTheme);
-
-      toast.success('Preferences saved!');
+        const newSettings = {
+            ...user.settings,
+            enableMotivation,
+            coachingStyle,
+            colorTheme,
+        };
+        setUser({ ...user, settings: newSettings });
+        toast.success('Preferences saved!');
     }
   };
+
+  useEffect(() => {
+    if (user?.settings.colorTheme) {
+      // remove any existing theme classes
+      colorThemes.forEach(t => document.body.classList.remove(t.class));
+      // add the new theme class
+      document.body.classList.add(user.settings.colorTheme);
+    }
+  }, [user?.settings.colorTheme]);
 
   const handleHabitSelectionChange = (selected: PredefinedHabit[]) => {
     const currentHabitIds = habits.map(h => h.id);

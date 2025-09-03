@@ -29,12 +29,6 @@ export function useUser() {
             }
         };
         setUserState(userWithSettings);
-        // Apply theme on load
-        if (userWithSettings.settings.colorTheme) {
-            document.body.className = userWithSettings.settings.colorTheme;
-        } else {
-             document.body.className = defaultSettings.colorTheme;
-        }
       }
     } catch (error) {
       console.error("Failed to load user from local storage", error);
@@ -68,7 +62,8 @@ export function useUser() {
     try {
       localStorage.removeItem(USER_STORAGE_KEY);
       setUserState(null);
-      document.body.className = ''; // Clear theme
+       // Clear all theme classes from body
+      document.body.className = '';
     } catch (error) {
       console.error("Failed to clear user from local storage", error);
     }

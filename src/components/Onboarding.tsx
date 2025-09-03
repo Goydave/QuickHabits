@@ -44,8 +44,10 @@ export default function Onboarding() {
             currentStreak: 0,
             longestStreak: 0,
             lastCheckinDate: null,
+            checkinHistory: [],
             xp: 0,
             level: 1,
+            isArchived: false,
         }));
 
     setHabits(newHabits);
@@ -68,7 +70,7 @@ export default function Onboarding() {
               transition={{ duration: 0.3 }}
             >
               <CardHeader>
-                <CardTitle className="font-headline text-2xl">Welcome to QuickHabits!</CardTitle>
+                <CardTitle className="font-headline">Welcome to QuickHabits!</CardTitle>
                 <CardDescription>First, what should we call you?</CardDescription>
               </CardHeader>
               <CardContent>
@@ -100,7 +102,7 @@ export default function Onboarding() {
               transition={{ duration: 0.3 }}
             >
               <CardHeader>
-                <CardTitle className="font-headline text-2xl">Meet Your AI Coach</CardTitle>
+                <CardTitle className="font-headline">Meet Your AI Coach</CardTitle>
                 <CardDescription>Tell your coach a goal, and they'll create a habit plan for you.</CardDescription>
               </CardHeader>
               <CardContent>
@@ -123,7 +125,7 @@ export default function Onboarding() {
               transition={{ duration: 0.3 }}
             >
               <CardHeader>
-                <CardTitle className="font-headline text-2xl">Choose Your Habits</CardTitle>
+                <CardTitle className="font-headline">Choose Your Habits</CardTitle>
                 <CardDescription>Select the habits you want to track. You can change these later in settings.</CardDescription>
               </CardHeader>
               <CardContent>

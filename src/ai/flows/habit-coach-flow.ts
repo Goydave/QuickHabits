@@ -11,9 +11,17 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 import { PREDEFINED_HABITS } from '@/lib/constants';
+import type { Habit } from '@/lib/types';
+
+
+const HabitSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+});
 
 const HabitSuggestionInputSchema = z.object({
   goal: z.string().describe('The user\'s high-level goal, e.g., "be healthier" or "be more productive".'),
+  existingHabits: z.array(HabitSchema).describe("A list of habits the user is already tracking."),
 });
 export type HabitSuggestionInput = z.infer<typeof HabitSuggestionInputSchema>;
 
@@ -45,9 +53,18 @@ The user's goal is: "{{goal}}"
 Here is a list of available habits they can track:
 ${availableHabits}
 
+The user is already tracking these habits, so DO NOT suggest them:
+{{#if existingHabits}}
+{{#each existingHabits}}
+- {{this.name}} (id: {{this.id}})
+{{/each}}
+{{else}}
+None
+{{/if}}
+
 Your task is to:
 1.  Analyze the user's goal.
-2.  Select 2 to 4 habits from the list that are most relevant to achieving that goal.
+2.  Select 2 to 4 habits from the available list that are most relevant to achieving that goal and are not in the user's existing list.
 3.  Provide a short, compelling reason for each suggestion.
 4.  Create a catchy, encouraging name for the overall plan.
 5.  Write a brief, one-sentence introduction to present the plan.

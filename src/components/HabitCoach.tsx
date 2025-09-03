@@ -11,6 +11,7 @@ import { PREDEFINED_HABITS } from '@/lib/constants';
 import HabitSelector from './HabitSelector';
 import type { PredefinedHabit } from '@/lib/types';
 import { Card, CardContent } from './ui/card';
+import { useHabits } from '@/hooks/use-habits';
 
 type HabitCoachProps = {
     onPlanReady: (selectedHabitIds: string[]) => void;
@@ -21,6 +22,7 @@ export default function HabitCoach({ onPlanReady }: HabitCoachProps) {
     const [isLoading, setIsLoading] = useState(false);
     const [suggestion, setSuggestion] = useState<HabitSuggestionOutput | null>(null);
     const [selectedHabits, setSelectedHabits] = useState<PredefinedHabit[]>([]);
+    const { habits } = useHabits();
 
     const handleGeneratePlan = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -30,7 +32,8 @@ export default function HabitCoach({ onPlanReady }: HabitCoachProps) {
         setSuggestion(null);
 
         try {
-            const result = await suggestHabits({ goal });
+            const existingHabits = habits.map(h => ({ id: h.id, name: h.name }));
+            const result = await suggestHabits({ goal, existingHabits });
             setSuggestion(result);
             
             // Pre-select the suggested habits
