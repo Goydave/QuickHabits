@@ -24,10 +24,11 @@ const HabitSchema = z.object({
   level: z.number(),
   xp: z.number(),
   isArchived: z.boolean().optional().default(false),
+  xpForNextLevel: z.number().describe('The total XP needed to reach the next level.'),
 });
 
 const DailyFocusInputSchema = z.object({
-  habits: z.array(HabitSchema).describe("The user's list of active habits."),
+  habits: z.array(HabitSchema).describe("The user's list of active habits, augmented with level-up data."),
 });
 export type DailyFocusInput = z.infer<typeof DailyFocusInputSchema>;
 
@@ -50,10 +51,10 @@ const prompt = ai.definePrompt({
   prompt: `You are an expert AI Life Coach. Your role is to provide a single, strategic "Daily Focus" for the user based on their list of habits. This focus should be encouraging and help them prioritize their efforts for the day.
 
 Analyze the user's habits, which are provided as a JSON object:
-{{{habits}}}
+{{{json habits}}}
 
 Here are some strategies to pick a focus:
-1.  **Level-Up Push:** If a user is very close to leveling up a habit (e.g., within 2 check-ins), make that the focus. Calculate this based on their current XP and the XP needed for the next level. Each check-in is worth 10 XP.
+1.  **Level-Up Push:** If a user is very close to leveling up a habit (e.g., their 'xp' is very close to 'xpForNextLevel'), make that the focus. Each check-in is worth 10 XP.
 2.  **Comeback Encouragement:** If a user has a low streak (0 or 1 day) on a habit they previously had a high level or streak on, encourage them to get back on track.
 3.  **Milestone Celebration:** If a user is about to hit a major streak milestone (like 7, 14, 30 days), highlight that to build excitement.
 4.  **Complementary Habit:** Suggest focusing on a habit that complements one they are already successful with. For example, if they have a high streak in "Exercise," suggest focusing on "Eat Healthy."

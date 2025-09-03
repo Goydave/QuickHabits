@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2, Target } from 'lucide-react';
 import { generateDailyFocus, DailyFocusOutput } from '@/ai/flows/daily-focus-flow';
 import type { Habit } from '@/lib/types';
+import { Skeleton } from './ui/skeleton';
 
 type DailyFocusProps = {
   habits: Habit[];
@@ -19,12 +20,17 @@ export default function DailyFocus({ habits }: DailyFocusProps) {
     const lastFetched = localStorage.getItem('dailyFocusLastFetched');
     const storedFocus = localStorage.getItem('dailyFocus');
 
+    const activeHabits = habits.filter(h => !h.isArchived);
+    
+    if (activeHabits.length === 0) {
+      setIsLoading(false);
+      return;
+    }
+
     if (lastFetched === today && storedFocus) {
       setFocus(JSON.parse(storedFocus));
       setIsLoading(false);
     } else {
-      const activeHabits = habits.filter(h => !h.isArchived);
-      if (activeHabits.length > 0) {
         // Sanitize habits to remove non-serializable icon component before sending to server
         const serializableHabits = activeHabits.map(({ icon, ...rest }) => rest);
 
@@ -41,20 +47,17 @@ export default function DailyFocus({ habits }: DailyFocusProps) {
           .finally(() => {
             setIsLoading(false);
           });
-      } else {
-        setIsLoading(false);
-      }
     }
   }, [habits]);
   
   if (isLoading) {
     return (
-        <Card className="bg-primary/10 border-primary/40">
+        <Card>
             <CardContent className="p-4 flex items-center gap-4">
-                <Loader2 className="w-6 h-6 text-primary animate-spin" />
-                <div className="space-y-1">
-                    <div className="h-4 w-32 bg-primary/20 rounded-md animate-pulse" />
-                    <div className="h-4 w-48 bg-primary/20 rounded-md animate-pulse" />
+                <Skeleton className="w-8 h-8 rounded-lg" />
+                <div className="space-y-2 flex-1">
+                    <Skeleton className="h-4 w-1/3" />
+                    <Skeleton className="h-4 w-4/5" />
                 </div>
             </CardContent>
         </Card>
@@ -62,7 +65,7 @@ export default function DailyFocus({ habits }: DailyFocusProps) {
   }
 
   if (!focus) {
-    return null; // Don't render anything if there's no focus
+    return null; // Don't render anything if there's no focus or an error occurred
   }
   
   const focusedHabit = habits.find(h => h.id === focus.focusedHabitId);
