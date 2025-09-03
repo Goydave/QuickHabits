@@ -22,7 +22,7 @@ export function useHabits() {
             return { 
               ...habit, 
               icon: predefined ? predefined.icon : () => null,
-              type: predefined ? predefined.type : 'build',
+              type: predefined ? (predefined.type || 'build') : 'build',
               xp: habit.xp || 0,
               level: habit.level || 1,
               isArchived: habit.isArchived || false,
@@ -83,7 +83,12 @@ export function useHabits() {
 
         const newLevel = getLevelFromXp(newXp);
 
-        const newHistory = [...(habit.checkinHistory || []), { date: todayStr }];
+        // Ensure checkinHistory is not undefined
+        const currentHistory = habit.checkinHistory || [];
+        // Prevent duplicate dates in history
+        const newHistory = currentHistory.some(c => c.date === todayStr) 
+            ? currentHistory 
+            : [...currentHistory, { date: todayStr }];
         
         updatedHabit = {
           ...habit,

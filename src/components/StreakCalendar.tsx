@@ -12,7 +12,7 @@ type StreakCalendarProps = {
 export default function StreakCalendar({ habit }: StreakCalendarProps) {
     const { theme } = useTheme();
 
-    const checkinDates = habit.checkinHistory.map(c => new Date(c.date + 'T12:00:00'));
+    const checkinDates = habit.checkinHistory?.map(c => new Date(c.date + 'T12:00:00')) || [];
 
     const modifiers = {
         checkedIn: checkinDates,
@@ -52,13 +52,14 @@ export default function StreakCalendar({ habit }: StreakCalendarProps) {
             <DayPicker
                 mode="multiple"
                 min={0}
-                max={100}
+                max={1000} // Allow multiple selections
                 selected={checkinDates}
                 modifiers={modifiers}
                 modifiersStyles={modifiersStyles}
                 style={calendarStyles}
                 showOutsideDays
                 fixedWeeks
+                disabled // Don't allow user interaction
             />
         </div>
     );

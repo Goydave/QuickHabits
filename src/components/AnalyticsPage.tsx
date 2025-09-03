@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useHabits } from '@/hooks/use-habits';
 import type { Habit } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,13 +8,25 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import StreakCalendar from './StreakCalendar';
 import ActivityGraph from './ActivityGraph';
 import { BarChart2, Calendar } from 'lucide-react';
+import SplashScreen from './SplashScreen';
 
 export default function AnalyticsPage() {
-    const { habits } = useHabits();
-    const [selectedHabitId, setSelectedHabitId] = useState<string | null>(habits[0]?.id || null);
+    const { habits, isLoading } = useHabits();
+    const [selectedHabitId, setSelectedHabitId] = useState<string | null>(null);
 
     const activeHabits = habits.filter(h => !h.isArchived);
+    
+    useEffect(() => {
+        if (activeHabits.length > 0 && !selectedHabitId) {
+            setSelectedHabitId(activeHabits[0].id);
+        }
+    }, [activeHabits, selectedHabitId]);
+
     const selectedHabit = activeHabits.find(h => h.id === selectedHabitId);
+
+    if (isLoading) {
+        return <SplashScreen />;
+    }
 
     if (activeHabits.length === 0) {
         return (
@@ -35,7 +47,7 @@ export default function AnalyticsPage() {
                     <CardDescription>Choose a habit to view its analytics.</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <Select value={selectedHabitId || undefined} onValueChange={setSelectedHabitId}>
+                    <Select value={selectedHabitId || undefined} onValueChange={(value) => setSelectedHabitId(value)}>
                         <SelectTrigger className="w-full md:w-[300px]">
                             <SelectValue placeholder="Select a habit..." />
                         </SelectTrigger>
