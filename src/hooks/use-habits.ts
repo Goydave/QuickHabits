@@ -26,6 +26,7 @@ export function useHabits() {
               xp: habit.xp || 0,
               level: habit.level || 1,
               isArchived: habit.isArchived || false,
+              checkinHistory: habit.checkinHistory || [],
             };
         });
         setHabitsState(habitsWithIcons);
@@ -81,12 +82,15 @@ export function useHabits() {
         }
 
         const newLevel = getLevelFromXp(newXp);
+
+        const newHistory = [...(habit.checkinHistory || []), { date: todayStr }];
         
         updatedHabit = {
           ...habit,
           currentStreak: newStreak,
           longestStreak: Math.max(habit.longestStreak, newStreak),
           lastCheckinDate: todayStr,
+          checkinHistory: newHistory,
           xp: newXp,
           level: newLevel,
         };
@@ -108,6 +112,7 @@ export function useHabits() {
       currentStreak: 0,
       longestStreak: 0,
       lastCheckinDate: null,
+      checkinHistory: [],
       xp: 0,
       level: 1,
       isArchived: false,

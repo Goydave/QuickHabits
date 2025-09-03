@@ -47,6 +47,11 @@ export default function Header() {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
+             <Link href="/analytics" passHref>
+              <DropdownMenuItem>
+                Analytics
+              </DropdownMenuItem>
+            </Link>
             <Link href="/settings" passHref>
               <DropdownMenuItem>
                 Settings

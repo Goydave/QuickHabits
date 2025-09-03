@@ -28,10 +28,15 @@ export type PredefinedHabit = {
   type?: HabitType;
 };
 
+export type Checkin = {
+    date: string; // YYYY-MM-DD
+}
+
 export type Habit = PredefinedHabit & {
   currentStreak: number;
   longestStreak: number;
   lastCheckinDate: string | null;
+  checkinHistory: Checkin[];
   xp: number;
   level: number;
   isArchived?: boolean;
