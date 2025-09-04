@@ -31,10 +31,8 @@ export default function DailyFocus({ habits }: DailyFocusProps) {
       setFocus(JSON.parse(storedFocus));
       setIsLoading(false);
     } else {
-        // Sanitize habits to remove non-serializable icon component before sending to server
-        const serializableHabits = activeHabits.map(({ icon, ...rest }) => rest);
-
-        generateDailyFocus({ habits: serializableHabits })
+        // We can send the full habit object here because the flow wrapper will handle augmentation.
+        generateDailyFocus({ habits: activeHabits })
           .then(result => {
             setFocus(result);
             localStorage.setItem('dailyFocus', JSON.stringify(result));
@@ -73,7 +71,7 @@ export default function DailyFocus({ habits }: DailyFocusProps) {
   return (
     <Card className="bg-gradient-to-br from-primary/20 to-primary/5 border-primary/40 shadow-lg transform hover:scale-[1.02] transition-transform duration-300">
         <CardHeader className="p-4 flex flex-row items-start gap-4 space-y-0">
-             {focusedHabit ? <focusedHabit.icon className="w-8 h-8 text-primary mt-1" /> : <Target className="w-8 h-8 text-primary mt-1" />}
+             {focusedHabit && focusedHabit.icon ? <focusedHabit.icon className="w-8 h-8 text-primary mt-1" /> : <Target className="w-8 h-8 text-primary mt-1" />}
             <div>
                 <CardTitle className="font-headline text-lg text-primary">{focus.headline}</CardTitle>
                 <p className="text-foreground/90">{focus.prompt}</p>

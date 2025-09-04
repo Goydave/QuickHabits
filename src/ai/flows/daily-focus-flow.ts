@@ -13,9 +13,15 @@ import { z } from 'zod';
 import type { Habit } from '@/lib/types';
 import { getXpForNextLevel } from '@/lib/game-mechanics';
 
-// We need to define the Habit schema using Zod for the AI prompt.
-// We can't import the TypeScript type directly into the prompt definition.
-const HabitSchema = z.object({
+// We define the input for the *exported function* which doesn't need the augmented data.
+const ClientDailyFocusInputSchema = z.object({
+  habits: z.array(z.custom<Habit>()).describe("The user's list of active habits."),
+});
+export type ClientDailyFocusInput = z.infer<typeof ClientDailyFocusInputSchema>;
+
+
+// The internal schema for the AI prompt requires the augmented data.
+const InternalHabitSchema = z.object({
   id: z.string(),
   name: z.string(),
   type: z.enum(['build', 'quit']).optional().default('build'),
@@ -25,10 +31,14 @@ const HabitSchema = z.object({
   xp: z.number(),
   isArchived: z.boolean().optional().default(false),
   xpForNextLevel: z.number().describe('The total XP needed to reach the next level.'),
+  lastCheckinDate: z.string().nullable(),
+  checkinHistory: z.array(z.object({ date: z.string() })),
+  specialAction: z.string().optional(),
 });
 
+
 const DailyFocusInputSchema = z.object({
-  habits: z.array(HabitSchema).describe("The user's list of active habits, augmented with level-up data."),
+  habits: z.array(InternalHabitSchema).describe("The user's list of active habits, augmented with level-up data."),
 });
 export type DailyFocusInput = z.infer<typeof DailyFocusInputSchema>;
 
@@ -40,8 +50,15 @@ const DailyFocusOutputSchema = z.object({
 });
 export type DailyFocusOutput = z.infer<typeof DailyFocusOutputSchema>;
 
-export async function generateDailyFocus(input: DailyFocusInput): Promise<DailyFocusOutput> {
-  return dailyFocusFlow(input);
+export async function generateDailyFocus({ habits }: ClientDailyFocusInput): Promise<DailyFocusOutput> {
+  // Augment habits with xp needed for next level to help the AI.
+  // This is the correct place to do it, before calling the flow.
+  const augmentedHabits = habits.map(h => ({
+      ...h,
+      xpForNextLevel: getXpForNextLevel(h.level),
+  }));
+
+  return dailyFocusFlow({ habits: augmentedHabits });
 }
 
 const prompt = ai.definePrompt({
@@ -82,13 +99,7 @@ const dailyFocusFlow = ai.defineFlow(
     outputSchema: DailyFocusOutputSchema,
   },
   async ({ habits }) => {
-    // Augment habits with xp needed for next level to help the AI
-    const augmentedHabits = habits.map(h => ({
-        ...h,
-        xpForNextLevel: getXpForNextLevel(h.level),
-    }));
-
-    const { output } = await prompt({ habits: augmentedHabits });
+    const { output } = await prompt({ habits });
     return output!;
   }
 );
