@@ -12,6 +12,7 @@ import { STREAK_MILESTONES } from '@/lib/constants';
 import DailyFocus from './DailyFocus';
 import AudioJournalPlayer from './AudioJournalPlayer';
 import AudioMeditationPlayer from './AudioMeditationPlayer';
+import VictoryImageDialog from './VictoryImageDialog';
 
 type DashboardProps = {
   action?: string | null;
@@ -26,6 +27,12 @@ export default function Dashboard({ action, onActionComplete }: DashboardProps) 
 
   const [isAudioPlayerOpen, setIsAudioPlayerOpen] = useState(false);
   const [isMeditationPlayerOpen, setIsMeditationPlayerOpen] = useState(false);
+
+  const [victoryState, setVictoryState] = useState<{ isOpen: boolean; habitName: string | null }>({
+    isOpen: false,
+    habitName: null,
+  });
+
 
   useEffect(() => {
     if (action === 'journal') {
@@ -61,10 +68,13 @@ export default function Dashboard({ action, onActionComplete }: DashboardProps) 
     if (updatedHabit) {
       const leveledUp = updatedHabit.level > originalLevel;
 
-      if (STREAK_MILESTONES.includes(updatedHabit.currentStreak) || leveledUp) {
+      // Trigger the special Victory Image on level up or major streak milestones
+      if (leveledUp || STREAK_MILESTONES.includes(updatedHabit.currentStreak)) {
+        setVictoryState({ isOpen: true, habitName: updatedHabit.name });
+        // Also show confetti for good measure
         setShowConfetti(true);
         setConfettiKey(prev => prev + 1);
-        setTimeout(() => setShowConfetti(false), 4000);
+        setTimeout(() => setShowConfetti(false), 5000); // let confetti run longer
       }
       
       if (leveledUp) {
@@ -116,6 +126,13 @@ export default function Dashboard({ action, onActionComplete }: DashboardProps) 
           if (!isOpen) onActionComplete?.();
         }}
         onComplete={handleAudioMeditationComplete}
+      />
+      
+      {/* Victory Image Dialog */}
+      <VictoryImageDialog
+        isOpen={victoryState.isOpen}
+        onOpenChange={(isOpen) => setVictoryState({ isOpen, habitName: null })}
+        habitName={victoryState.habitName}
       />
 
 
