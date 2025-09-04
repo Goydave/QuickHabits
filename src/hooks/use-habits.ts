@@ -110,7 +110,16 @@ export function useHabits() {
 
   const addHabit = useCallback((habitId: string) => {
     const predefinedHabit = PREDEFINED_HABITS.find(h => h.id === habitId);
-    if (!predefinedHabit || habits.some(h => h.id === habitId)) return;
+    if (!predefinedHabit) return;
+
+    const existingHabit = habits.find(h => h.id === habitId);
+    if (existingHabit) {
+        // If habit exists and is archived, unarchive it
+        if (existingHabit.isArchived) {
+            toggleHabitArchive(habitId);
+        }
+        return;
+    }
 
     const newHabit: Habit = {
       ...predefinedHabit,

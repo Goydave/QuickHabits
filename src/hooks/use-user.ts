@@ -11,6 +11,8 @@ const defaultSettings: UserSettings = {
   colorTheme: 'theme-amber',
 };
 
+const colorThemes = ['theme-amber', 'theme-green', 'theme-blue', 'theme-violet'];
+
 export function useUser() {
   const [user, setUserState] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -29,6 +31,10 @@ export function useUser() {
             }
         };
         setUserState(userWithSettings);
+         // Apply theme on initial load
+        if (userWithSettings.settings.colorTheme) {
+            document.body.classList.add(userWithSettings.settings.colorTheme);
+        }
       }
     } catch (error) {
       console.error("Failed to load user from local storage", error);
@@ -38,6 +44,9 @@ export function useUser() {
 
   const setUser = useCallback((newUser: User | null) => {
     try {
+      // Clear all possible theme classes before setting a new one
+      colorThemes.forEach(theme => document.body.classList.remove(theme));
+
       if (newUser) {
         // Ensure settings always have defaults
         const userToSave = {
@@ -49,6 +58,11 @@ export function useUser() {
         };
         localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(userToSave));
         setUserState(userToSave);
+
+        // Apply new theme
+        if (userToSave.settings.colorTheme) {
+          document.body.classList.add(userToSave.settings.colorTheme);
+        }
       } else {
         localStorage.removeItem(USER_STORAGE_KEY);
         setUserState(null);

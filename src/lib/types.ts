@@ -39,7 +39,7 @@ export type Habit = PredefinedHabit & {
   checkinHistory: Checkin[];
   xp: number;
   level: number;
-  isArchived?: boolean;
+  isArchived: boolean;
 };
 
 export type DailyFocus = {

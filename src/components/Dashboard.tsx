@@ -45,7 +45,7 @@ export default function Dashboard({ action, onActionComplete }: DashboardProps) 
   const handleAudioMeditationComplete = () => {
     const habit = habits.find(h => h.id === 'meditate');
     if (habit) handleCheckIn('meditate');
-setIsMeditationPlayerOpen(false);
+    setIsMeditationPlayerOpen(false);
     onActionComplete?.();
   }
 

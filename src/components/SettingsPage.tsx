@@ -21,11 +21,11 @@ import {
 import { toast } from 'sonner';
 import { PREDEFINED_HABITS } from '@/lib/constants';
 import HabitSelector from './HabitSelector';
-import type { Habit, PredefinedHabit } from '@/lib/types';
+import type { PredefinedHabit } from '@/lib/types';
 import { useTheme } from 'next-themes';
 import { RadioGroup, RadioGroupItem } from './ui/radio-group';
 import { Switch } from './ui/switch';
-import { Check, Palette, Archive, ArchiveRestore } from 'lucide-react';
+import { Check, Archive, ArchiveRestore } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { CoachingStyle } from '@/lib/types';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -66,32 +66,36 @@ export default function SettingsPage() {
   };
 
   useEffect(() => {
-    if (user?.settings.colorTheme) {
-      // remove any existing theme classes
-      colorThemes.forEach(t => document.body.classList.remove(t.class));
-      // add the new theme class
-      document.body.classList.add(user.settings.colorTheme);
+    // This effect runs on the client and ensures the theme class is on the body
+    if (colorTheme) {
+      document.body.className = ''; // Clear existing theme classes
+      document.body.classList.add(colorTheme);
     }
-  }, [user?.settings.colorTheme]);
+  }, [colorTheme]);
+
 
   const handleHabitSelectionChange = (selected: PredefinedHabit[]) => {
     const currentHabitIds = habits.map(h => h.id);
     const selectedHabitIds = selected.map(h => h.id);
 
+    // Add new habits
     const habitsToAdd = selected.filter(h => !currentHabitIds.includes(h.id));
     habitsToAdd.forEach(habit => addHabit(habit.id));
 
-    const habitsToRemove = habits.filter(h => !selectedHabitIds.includes(h.id));
-    habitsToRemove.forEach(habit => removeHabit(habit.id));
+    // Re-activate archived habits if they are selected again
+    const habitsToReactivate = habits.filter(h => h.isArchived && selectedHabitIds.includes(h.id));
+    habitsToReactivate.forEach(habit => toggleHabitArchive(habit.id));
 
     toast.success('Habits updated!');
   };
   
   const handleResetAccount = () => {
     clearHabits();
+    // No need for clearUser, as it's part of the redirect which unloads state
     window.location.href = '/';
   }
 
+  // Habits selected in the "Add New" tab should include active and archived ones
   const selectedPredefinedHabits = PREDEFINED_HABITS.filter(ph => 
     habits.some(h => h.id === ph.id)
   );
@@ -277,7 +281,7 @@ export default function SettingsPage() {
                                 </div>
                             ))}
                         </div>
-                    ) : <p className="text-muted-foreground text-center">No active habits.</p>}
+                    ) : <p className="text-muted-foreground text-center py-4">No active habits.</p>}
                 </TabsContent>
                 <TabsContent value="archived">
                     {archivedHabits.length > 0 ? (
@@ -294,7 +298,7 @@ export default function SettingsPage() {
                                 </div>
                             ))}
                         </div>
-                    ) : <p className="text-muted-foreground text-center">No archived habits.</p>}
+                    ) : <p className="text-muted-foreground text-center py-4">No archived habits.</p>}
                 </TabsContent>
                 <TabsContent value="add">
                      <HabitSelector

@@ -37,14 +37,14 @@ const suggestHabitTool = ai.defineTool(
         description: 'Suggests a new habit for the user to try based on their current habit.',
         inputSchema: z.object({
             currentHabit: z.string().describe('The user\'s current habit.'),
-            allHabits: z.array(z.string()).describe('The list of all available habits.'),
         }),
         outputSchema: z.object({
             suggestion: z.string().optional().describe('The suggested new habit.'),
         }),
     },
-    async ({ currentHabit, allHabits }) => {
+    async ({ currentHabit }, context) => {
         // Simple logic: suggest a related habit. This could be improved with more sophisticated logic.
+        const allHabits = context?.allHabits as string[] || [];
         const relatedHabits: Record<string, string[]> = {
             'Exercise': ['Drink Water', 'Eat Healthy'],
             'Eat Healthy': ['Exercise', 'No Junk Food'],
@@ -112,12 +112,12 @@ const motivationalPromptFlow = ai.defineFlow(
     inputSchema: MotivationalPromptInputSchema,
     outputSchema: MotivationalPromptOutputSchema,
   },
-  async input => {
+  async (input) => {
+    // Pass the full list of available habits to the tool's context.
     const allHabitNames = PREDEFINED_HABITS.map(h => h.name);
-    const {output} = await prompt(input, {
-        context: {
+    const { output } = await prompt(input, {
+        tool_context: {
             allHabits: allHabitNames,
-            currentHabit: input.habit
         }
     });
     return output!;

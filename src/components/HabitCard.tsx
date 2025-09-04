@@ -7,7 +7,7 @@ import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Check, Share2, Copy } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { getXpForCurrentLevel, getXpForNextLevel } from '@/lib/game-mechanics';
 import { useState } from 'react';
@@ -21,7 +21,6 @@ type HabitCardProps = {
 };
 
 export default function HabitCard({ habit, onCheckIn }: HabitCardProps) {
-  const { toast } = useToast();
   const today = new Date().toISOString().split('T')[0];
   const isCheckedIn = habit.lastCheckinDate === today;
   const habitType = habit.type || 'build';
@@ -40,14 +39,11 @@ export default function HabitCard({ habit, onCheckIn }: HabitCardProps) {
   const handleCopyToClipboard = async () => {
     try {
       await navigator.clipboard.writeText(shareText);
-      toast({
-        title: 'Copied to clipboard!',
+      toast.success('Copied to clipboard!', {
         description: 'You can now share your progress with your friends.',
       });
     } catch (err) {
-      toast({
-        variant: 'destructive',
-        title: 'Oops!',
+      toast.error('Oops!', {
         description: 'Could not copy to clipboard. Please try again.',
       });
     }
