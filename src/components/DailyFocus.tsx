@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -31,8 +32,10 @@ export default function DailyFocus({ habits }: DailyFocusProps) {
       setFocus(JSON.parse(storedFocus));
       setIsLoading(false);
     } else {
-        // We can send the full habit object here because the flow wrapper will handle augmentation.
-        generateDailyFocus({ habits: activeHabits })
+        // Sanitize habits before sending to the server action, removing non-serializable parts like the icon component.
+        const serializableHabits = activeHabits.map(({ icon, ...rest }) => rest);
+
+        generateDailyFocus({ habits: serializableHabits })
           .then(result => {
             setFocus(result);
             localStorage.setItem('dailyFocus', JSON.stringify(result));
