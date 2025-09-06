@@ -29,15 +29,19 @@ const promptGenerator = ai.definePrompt({
   
   Generate a single, unique, and reflective journaling prompt. 
   
-  The prompt should be open-ended and encourage self-reflection, mindfulness, or gratitude. 
+  The prompt should be open-ended and encourage self-reflection, mindfulness, gratitude, or creativity.
+  It could be about their day, a book they are reading, a feeling, or a future aspiration.
+  
   Avoid generic or cliché questions. 
   
-  Make it something that would make a person pause and think deeply for a minute.
-  Keep the prompt to a single sentence.
+  Make it something that would make a person pause and think deeply.
+  Keep the prompt to a single, concise question.
 
   Example: "What is a belief you hold that you haven't questioned in a while?"
   Example: "Describe a moment today, no matter how small, that brought you a sense of peace."
   Example: "If you could write a letter to your younger self, what's one piece of advice you'd give about the journey ahead?"
+  Example: "What character from a book you've read recently do you relate to the most, and why?"
+  Example: "Describe a color that matches your current mood and explain your choice."
   `,
 });
 

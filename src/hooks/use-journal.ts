@@ -3,14 +3,9 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { v4 as uuidv4 } from 'uuid';
+import type { JournalEntry } from '@/lib/types';
 
 const JOURNAL_STORAGE_KEY = 'quickhabits-journal';
-
-export type JournalEntry = {
-    id: string;
-    content: string;
-    date: string; // ISO String
-};
 
 export function useJournal() {
     const [entries, setEntriesState] = useState<JournalEntry[]>([]);
@@ -42,14 +37,15 @@ export function useJournal() {
         }
     }, []);
 
-    const addEntry = useCallback((content: string) => {
+    const addEntry = useCallback((entryData: Omit<JournalEntry, 'id' | 'date'>) => {
         const newEntry: JournalEntry = {
+            ...entryData,
             id: uuidv4(),
-            content,
             date: new Date().toISOString(),
         };
         const newEntries = [newEntry, ...entries];
         setEntries(newEntries);
+        return newEntry;
     }, [entries, setEntries]);
 
 

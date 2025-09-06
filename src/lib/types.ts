@@ -47,3 +47,12 @@ export type DailyFocus = {
     prompt: string;
     focusedHabitId: string;
 }
+
+export type JournalEntry = {
+    id: string;
+    title: string;
+    content: string;
+    date: string; // ISO String
+    mood?: 'happy' | 'sad' | 'neutral' | 'excited' | 'calm';
+    linkedBookId?: string;
+};
