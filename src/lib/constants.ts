@@ -1,4 +1,4 @@
-import { GlassWater, Dumbbell, BookOpen, BrainCircuit, Sunrise, Salad, Ban, Lightbulb, PenSquare, ListTodo, BeerOff, Sparkles, Wand, Footprints, Headphones, BookMarked, Library } from 'lucide-react';
+import { GlassWater, Dumbbell, BookOpen, BrainCircuit, Sunrise, Salad, Ban, Lightbulb, PenSquare, ListTodo, BeerOff, Sparkles, Wand, Footprints } from 'lucide-react';
 import type { PredefinedHabit } from './types';
 
 export const PREDEFINED_HABITS: PredefinedHabit[] = [

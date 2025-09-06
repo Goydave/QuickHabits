@@ -15,8 +15,9 @@ import AudioMeditationPlayer from './AudioMeditationPlayer';
 import VictoryImageDialog from './VictoryImageDialog';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
-import { Headphones, Library, BookMarked, Check } from 'lucide-react';
+import { Headphones, Library, BookMarked, Check, ArrowRight } from 'lucide-react';
 import ReadingJournalDialog from './ReadingJournalDialog';
+import Link from 'next/link';
 
 type DashboardProps = {
   action?: string | null;
@@ -138,9 +139,28 @@ export default function Dashboard({ action, onActionComplete }: DashboardProps) 
   };
 
   const literaryFeatures = [
-    { id: 'audiobook', icon: Headphones, title: 'Listen to an Audiobook', description: 'Expand your mind, one chapter at a time.', action: () => handleCompleteFeature('audiobook') },
-    { id: 'reading-journal', icon: BookMarked, title: 'Write in Reading Journal', description: 'Reflect on your reading journey.', action: () => setIsReadingJournalOpen(true) },
-    { id: 'library-visit', icon: Library, title: 'Visit a Library', description: 'Explore a world of books and knowledge.', action: () => handleCompleteFeature('library-visit') },
+    { 
+      id: 'audiobook', 
+      icon: Headphones, 
+      title: 'Listen to an Audiobook', 
+      description: 'Expand your mind, one chapter at a time.', 
+      isLink: true,
+      href: '/audiobooks',
+    },
+    { 
+      id: 'reading-journal', 
+      icon: BookMarked, 
+      title: 'Write in Reading Journal', 
+      description: 'Reflect on your reading journey.', 
+      action: () => setIsReadingJournalOpen(true) 
+    },
+    { 
+      id: 'library-visit', 
+      icon: Library, 
+      title: 'Visit a Library', 
+      description: 'Explore a world of books and knowledge.', 
+      action: () => handleCompleteFeature('library-visit') 
+    },
   ];
 
   return (
@@ -221,9 +241,17 @@ export default function Dashboard({ action, onActionComplete }: DashboardProps) 
                     <p className="text-sm text-muted-foreground">{feature.description}</p>
                   </CardContent>
                   <div className="p-4 pt-0">
-                    <Button onClick={feature.action} disabled={isCompleted} className="w-full">
-                      {isCompleted ? <><Check className="mr-2"/> Done for Today</> : 'Mark as Done'}
-                    </Button>
+                     {feature.isLink ? (
+                        <Button asChild className="w-full">
+                           <Link href={feature.href!}>
+                              Explore Audiobooks <ArrowRight className="ml-2"/>
+                           </Link>
+                        </Button>
+                      ) : (
+                        <Button onClick={feature.action} disabled={isCompleted} className="w-full">
+                          {isCompleted ? <><Check className="mr-2"/> Done for Today</> : 'Mark as Done'}
+                        </Button>
+                      )}
                   </div>
                 </Card>
               )
