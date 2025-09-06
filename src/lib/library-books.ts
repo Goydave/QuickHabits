@@ -368,11 +368,11 @@ export const LIBRARY_BOOKS: LibraryBook[] = [
         url: 'https://www.gutenberg.org/files/6130/6130-0.txt'
     },
     {
-        id: '1727',
+        id: '1728',
         title: 'The Odyssey',
         author: 'Homer',
         coverUrl: 'https://picsum.photos/300/400?random=58',
-        url: 'https://www.gutenberg.org/files/1727/1727-0.txt'
+        url: 'https://www.gutenberg.org/files/1728/1728-0.txt'
     },
     {
         id: '2852',
