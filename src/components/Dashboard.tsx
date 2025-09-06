@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useHabits } from '@/hooks/use-habits';
@@ -16,7 +17,6 @@ import VictoryImageDialog from './VictoryImageDialog';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Headphones, Library, BookMarked, Check, ArrowRight } from 'lucide-react';
-import ReadingJournalDialog from './ReadingJournalDialog';
 import Link from 'next/link';
 
 type DashboardProps = {
@@ -32,7 +32,6 @@ export default function Dashboard({ action, onActionComplete }: DashboardProps) 
 
   const [isAudioPlayerOpen, setIsAudioPlayerOpen] = useState(false);
   const [isMeditationPlayerOpen, setIsMeditationPlayerOpen] = useState(false);
-  const [isReadingJournalOpen, setIsReadingJournalOpen] = useState(false);
   
   const [completedFeatures, setCompletedFeatures] = useState<string[]>([]);
   
@@ -151,8 +150,9 @@ export default function Dashboard({ action, onActionComplete }: DashboardProps) 
       id: 'reading-journal', 
       icon: BookMarked, 
       title: 'Write in Reading Journal', 
-      description: 'Reflect on your reading journey.', 
-      action: () => setIsReadingJournalOpen(true) 
+      description: 'Reflect on your reading journey.',
+      isLink: true,
+      href: '/journal',
     },
     { 
       id: 'library-visit', 
@@ -183,14 +183,6 @@ export default function Dashboard({ action, onActionComplete }: DashboardProps) 
           if (!isOpen) onActionComplete?.();
         }}
         onComplete={handleAudioMeditationComplete}
-      />
-       <ReadingJournalDialog
-        isOpen={isReadingJournalOpen}
-        onOpenChange={setIsReadingJournalOpen}
-        onSave={() => {
-          handleCompleteFeature('reading-journal');
-          setIsReadingJournalOpen(false);
-        }}
       />
       
       {/* Victory Image Dialog */}
@@ -244,7 +236,7 @@ export default function Dashboard({ action, onActionComplete }: DashboardProps) 
                      {feature.isLink ? (
                         <Button asChild className="w-full">
                            <Link href={feature.href!}>
-                              Explore Audiobooks <ArrowRight className="ml-2"/>
+                              {feature.title} <ArrowRight className="ml-2"/>
                            </Link>
                         </Button>
                       ) : (

@@ -24,5 +24,5 @@
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
   "exclude": ["node_modules"],
-  "files": ["src/types/wav.d.ts"]
+  "files": ["src/types/wav.d.ts", "src/types/uuid.d.ts"]
 }
