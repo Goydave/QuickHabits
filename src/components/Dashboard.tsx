@@ -130,6 +130,14 @@ export default function Dashboard({ action, onActionComplete }: DashboardProps) 
 
   const literaryFeatures = [
     { 
+      id: 'library-visit', 
+      icon: Library, 
+      title: 'Visit a Library', 
+      description: 'Explore a world of books and knowledge.', 
+      isLink: true,
+      href: '/library'
+    },
+    { 
       id: 'audiobook', 
       icon: Headphones, 
       title: 'Listen to an Audiobook', 
@@ -144,14 +152,6 @@ export default function Dashboard({ action, onActionComplete }: DashboardProps) 
       description: 'Reflect on your reading journey.',
       isLink: true,
       href: '/journal',
-    },
-    { 
-      id: 'library-visit', 
-      icon: Library, 
-      title: 'Visit a Library', 
-      description: 'Explore a world of books and knowledge.', 
-      isLink: true,
-      href: '/library'
     },
   ];
 
