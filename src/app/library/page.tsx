@@ -26,27 +26,29 @@ export default function LibraryPage() {
                     </h1>
                 </div>
                 <p className="text-muted-foreground mb-8 text-center md:text-left">
-                    Browse a collection of classic books from the public domain.
+                    Browse a collection of classic books from the public domain. Click on a book to read it.
                 </p>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                     {LIBRARY_BOOKS.map((book) => (
-                        <Card key={book.id} className="flex flex-col">
-                            <CardHeader className="p-0">
-                                <Image
-                                    src={book.coverUrl}
-                                    alt={`Cover art for ${book.title}`}
-                                    width={300}
-                                    height={400}
-                                    className="rounded-t-lg aspect-[3/4] object-cover"
-                                    data-ai-hint="book cover"
-                                />
-                            </CardHeader>
-                            <CardContent className="flex-grow p-4">
-                                <h2 className="font-bold text-lg">{book.title}</h2>
-                                <p className="text-sm text-muted-foreground">{book.author}</p>
-                            </CardContent>
-                        </Card>
+                        <a href={book.url} key={book.id} target="_blank" rel="noopener noreferrer" className="block transform hover:scale-105 transition-transform duration-300">
+                            <Card className="flex flex-col h-full">
+                                <CardHeader className="p-0">
+                                    <Image
+                                        src={book.coverUrl}
+                                        alt={`Cover art for ${book.title}`}
+                                        width={300}
+                                        height={400}
+                                        className="rounded-t-lg aspect-[3/4] object-cover"
+                                        data-ai-hint="book cover"
+                                    />
+                                </CardHeader>
+                                <CardContent className="flex-grow p-4">
+                                    <h2 className="font-bold text-lg">{book.title}</h2>
+                                    <p className="text-sm text-muted-foreground">{book.author}</p>
+                                </CardContent>
+                            </Card>
+                        </a>
                     ))}
                 </div>
             </main>
