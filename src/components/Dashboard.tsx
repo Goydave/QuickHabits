@@ -50,15 +50,6 @@ export default function Dashboard({ action, onActionComplete }: DashboardProps) 
     }
   }, []);
 
-  const handleCompleteFeature = (featureId: string) => {
-    const today = new Date().toISOString().split('T')[0];
-    const newCompletedFeatures = [...completedFeatures, featureId];
-    setCompletedFeatures(newCompletedFeatures);
-    localStorage.setItem('completedFeatures', JSON.stringify(newCompletedFeatures));
-    localStorage.setItem('featuresCompletedDate', today);
-    toast.success("Great job!", { description: "You've completed a literary activity today." });
-  }
-
   const [victoryState, setVictoryState] = useState<{ isOpen: boolean; habitName: string | null }>({
     isOpen: false,
     habitName: null,
@@ -159,7 +150,8 @@ export default function Dashboard({ action, onActionComplete }: DashboardProps) 
       icon: Library, 
       title: 'Visit a Library', 
       description: 'Explore a world of books and knowledge.', 
-      action: () => handleCompleteFeature('library-visit') 
+      isLink: true,
+      href: '/library'
     },
   ];
 
@@ -236,7 +228,7 @@ export default function Dashboard({ action, onActionComplete }: DashboardProps) 
                      {feature.isLink ? (
                         <Button asChild className="w-full">
                            <Link href={feature.href!}>
-                              {feature.title} <ArrowRight className="ml-2"/>
+                              Explore <ArrowRight className="ml-2"/>
                            </Link>
                         </Button>
                       ) : (
