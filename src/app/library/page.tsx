@@ -29,7 +29,7 @@ export default function LibraryPage() {
                     Browse a collection of classic books from the public domain. Click on a book to read it.
                 </p>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
                     {LIBRARY_BOOKS.map((book) => (
                         <Link href={`/read/${book.id}`} key={book.id} className="block transform hover:scale-105 transition-transform duration-300">
                             <Card className="flex flex-col h-full">
