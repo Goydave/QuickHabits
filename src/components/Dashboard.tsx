@@ -190,25 +190,11 @@ export default function Dashboard({ action, onActionComplete }: DashboardProps) 
         <h1 className="text-2xl md:text-4xl font-bold font-headline text-center mb-2">
           Hello, {user?.nickname}!
         </h1>
-        <p className="text-center text-muted-foreground mb-6 md:mb-8 text-sm md:text-base">
+        <p className="text-center text-muted-foreground mb-8 text-sm md:text-base">
           {activeHabits.length > 0 ? "Your daily progress is looking great. Keep it up!" : "You have no active habits. Go to settings to add some!"}
         </p>
 
-        <div className="mb-6 md:mb-8">
-          <DailyFocus habits={habits} />
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-          {activeHabits.map((habit) => (
-            <HabitCard
-              key={habit.id}
-              habit={habit}
-              onCheckIn={() => handleCheckIn(habit.id)}
-            />
-          ))}
-        </div>
-
-        <div className="mt-10">
+        <div className="mb-10">
           <h2 className="text-2xl font-bold font-headline text-center mb-6">Literary Corner</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             {literaryFeatures.map(feature => {
@@ -241,6 +227,20 @@ export default function Dashboard({ action, onActionComplete }: DashboardProps) 
               )
             })}
           </div>
+        </div>
+
+        <div className="mb-6 md:mb-8">
+          <DailyFocus habits={habits} />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+          {activeHabits.map((habit) => (
+            <HabitCard
+              key={habit.id}
+              habit={habit}
+              onCheckIn={() => handleCheckIn(habit.id)}
+            />
+          ))}
         </div>
       </main>
     </div>
