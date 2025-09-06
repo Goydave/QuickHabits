@@ -13,6 +13,10 @@ import DailyFocus from './DailyFocus';
 import AudioJournalPlayer from './AudioJournalPlayer';
 import AudioMeditationPlayer from './AudioMeditationPlayer';
 import VictoryImageDialog from './VictoryImageDialog';
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import { Button } from './ui/button';
+import { Headphones, Library, BookMarked, Check } from 'lucide-react';
+import ReadingJournalDialog from './ReadingJournalDialog';
 
 type DashboardProps = {
   action?: string | null;
@@ -27,6 +31,33 @@ export default function Dashboard({ action, onActionComplete }: DashboardProps) 
 
   const [isAudioPlayerOpen, setIsAudioPlayerOpen] = useState(false);
   const [isMeditationPlayerOpen, setIsMeditationPlayerOpen] = useState(false);
+  const [isReadingJournalOpen, setIsReadingJournalOpen] = useState(false);
+  
+  const [completedFeatures, setCompletedFeatures] = useState<string[]>([]);
+  
+  useEffect(() => {
+    const today = new Date().toISOString().split('T')[0];
+    const storedDate = localStorage.getItem('featuresCompletedDate');
+    if (storedDate === today) {
+      const storedFeatures = localStorage.getItem('completedFeatures');
+      if (storedFeatures) {
+        setCompletedFeatures(JSON.parse(storedFeatures));
+      }
+    } else {
+      // Reset on a new day
+      localStorage.removeItem('completedFeatures');
+      localStorage.removeItem('featuresCompletedDate');
+    }
+  }, []);
+
+  const handleCompleteFeature = (featureId: string) => {
+    const today = new Date().toISOString().split('T')[0];
+    const newCompletedFeatures = [...completedFeatures, featureId];
+    setCompletedFeatures(newCompletedFeatures);
+    localStorage.setItem('completedFeatures', JSON.stringify(newCompletedFeatures));
+    localStorage.setItem('featuresCompletedDate', today);
+    toast.success("Great job!", { description: "You've completed a literary activity today." });
+  }
 
   const [victoryState, setVictoryState] = useState<{ isOpen: boolean; habitName: string | null }>({
     isOpen: false,
@@ -106,6 +137,12 @@ export default function Dashboard({ action, onActionComplete }: DashboardProps) 
     }
   };
 
+  const literaryFeatures = [
+    { id: 'audiobook', icon: Headphones, title: 'Listen to an Audiobook', description: 'Expand your mind, one chapter at a time.', action: () => handleCompleteFeature('audiobook') },
+    { id: 'reading-journal', icon: BookMarked, title: 'Write in Reading Journal', description: 'Reflect on your reading journey.', action: () => setIsReadingJournalOpen(true) },
+    { id: 'library-visit', icon: Library, title: 'Visit a Library', description: 'Explore a world of books and knowledge.', action: () => handleCompleteFeature('library-visit') },
+  ];
+
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground p-4 md:p-6">
       {showConfetti && <Confetti key={confettiKey} />}
@@ -126,6 +163,14 @@ export default function Dashboard({ action, onActionComplete }: DashboardProps) 
           if (!isOpen) onActionComplete?.();
         }}
         onComplete={handleAudioMeditationComplete}
+      />
+       <ReadingJournalDialog
+        isOpen={isReadingJournalOpen}
+        onOpenChange={setIsReadingJournalOpen}
+        onSave={() => {
+          handleCompleteFeature('reading-journal');
+          setIsReadingJournalOpen(false);
+        }}
       />
       
       {/* Victory Image Dialog */}
@@ -157,6 +202,33 @@ export default function Dashboard({ action, onActionComplete }: DashboardProps) 
               onCheckIn={() => handleCheckIn(habit.id)}
             />
           ))}
+        </div>
+
+        <div className="mt-10">
+          <h2 className="text-2xl font-bold font-headline text-center mb-6">Literary Corner</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+            {literaryFeatures.map(feature => {
+              const isCompleted = completedFeatures.includes(feature.id);
+              return (
+                <Card key={feature.id} className="flex flex-col">
+                  <CardHeader className="flex-row items-center gap-3 space-y-0 pb-4">
+                     <div className="p-3 rounded-lg bg-primary/10 text-primary">
+                      <feature.icon className="w-5 h-5" />
+                    </div>
+                    <CardTitle className="font-headline text-lg">{feature.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent className="flex-grow">
+                    <p className="text-sm text-muted-foreground">{feature.description}</p>
+                  </CardContent>
+                  <div className="p-4 pt-0">
+                    <Button onClick={feature.action} disabled={isCompleted} className="w-full">
+                      {isCompleted ? <><Check className="mr-2"/> Done for Today</> : 'Mark as Done'}
+                    </Button>
+                  </div>
+                </Card>
+              )
+            })}
+          </div>
         </div>
       </main>
     </div>

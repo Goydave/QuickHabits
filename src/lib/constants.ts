@@ -16,9 +16,6 @@ export const PREDEFINED_HABITS: PredefinedHabit[] = [
   { id: 'tidy-up', name: 'Tidy Up', icon: Sparkles, type: 'build' },
   { id: 'practice-skill', name: 'Practice a Skill', icon: Wand, type: 'build' },
   { id: 'go-for-walk', name: 'Go for a Walk', icon: Footprints, type: 'build' },
-  { id: 'listen-audiobook', name: 'Listen to Audiobook', icon: Headphones, type: 'build' },
-  { id: 'write-reading-journal', name: 'Write in Reading Journal', icon: BookMarked, type: 'build' },
-  { id: 'visit-library', name: 'Visit a Library', icon: Library, type: 'build' },
 ];
 
 export const STREAK_MILESTONES = [3, 7, 14, 30, 60, 100, 365];
