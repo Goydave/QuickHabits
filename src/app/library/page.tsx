@@ -31,7 +31,7 @@ export default function LibraryPage() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                     {LIBRARY_BOOKS.map((book) => (
-                        <a href={book.url} key={book.id} target="_blank" rel="noopener noreferrer" className="block transform hover:scale-105 transition-transform duration-300">
+                        <Link href={`/read/${book.id}`} key={book.id} className="block transform hover:scale-105 transition-transform duration-300">
                             <Card className="flex flex-col h-full">
                                 <CardHeader className="p-0">
                                     <Image
@@ -48,7 +48,7 @@ export default function LibraryPage() {
                                     <p className="text-sm text-muted-foreground">{book.author}</p>
                                 </CardContent>
                             </Card>
-                        </a>
+                        </Link>
                     ))}
                 </div>
             </main>
