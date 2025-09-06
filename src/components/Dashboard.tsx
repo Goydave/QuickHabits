@@ -16,7 +16,7 @@ import AudioMeditationPlayer from './AudioMeditationPlayer';
 import VictoryImageDialog from './VictoryImageDialog';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
-import { Headphones, Library, BookMarked, Check, ArrowRight } from 'lucide-react';
+import { Library, BookMarked, Check, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
 type DashboardProps = {
@@ -138,14 +138,6 @@ export default function Dashboard({ action, onActionComplete }: DashboardProps) 
       href: '/library'
     },
     { 
-      id: 'audiobook', 
-      icon: Headphones, 
-      title: 'Listen to an Audiobook', 
-      description: 'Expand your mind, one chapter at a time.', 
-      isLink: true,
-      href: '/audiobooks',
-    },
-    { 
       id: 'reading-journal', 
       icon: BookMarked, 
       title: 'Write in Reading Journal', 
@@ -218,7 +210,7 @@ export default function Dashboard({ action, onActionComplete }: DashboardProps) 
                            </Link>
                         </Button>
                       ) : (
-                        <Button onClick={feature.action} disabled={isCompleted} className="w-full">
+                        <Button onClick={() => {}} disabled={isCompleted} className="w-full">
                           {isCompleted ? <><Check className="mr-2"/> Done for Today</> : 'Mark as Done'}
                         </Button>
                       )}
