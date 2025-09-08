@@ -14,7 +14,8 @@ export default function ReadBookPage({ params }: { params: { id: string } }) {
     const [bookContent, setBookContent] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const book = LIBRARY_BOOKS.find((b) => b.id === params.id);
+    const { id } = params;
+    const book = LIBRARY_BOOKS.find((b) => b.id === id);
 
     useEffect(() => {
         if (!book) {
