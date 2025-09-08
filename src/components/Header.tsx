@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useUser } from '@/hooks/use-user';
@@ -47,6 +48,11 @@ export default function Header() {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
+            <Link href="/profile" passHref>
+              <DropdownMenuItem>
+                Profile
+              </DropdownMenuItem>
+            </Link>
              <Link href="/analytics" passHref>
               <DropdownMenuItem>
                 Analytics

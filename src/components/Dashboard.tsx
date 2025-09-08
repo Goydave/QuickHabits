@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useHabits } from '@/hooks/use-habits';
@@ -24,7 +25,7 @@ type DashboardProps = {
 }
 
 export default function Dashboard({ action, onActionComplete }: DashboardProps) {
-  const { user } = useUser();
+  const { user, checkAndAwardAchievements } = useUser();
   const { habits, checkIn } = useHabits();
   const [showConfetti, setShowConfetti] = useState(false);
   const [confettiKey, setConfettiKey] = useState(0);
@@ -89,6 +90,11 @@ export default function Dashboard({ action, onActionComplete }: DashboardProps) 
     if (updatedHabit) {
       const leveledUp = updatedHabit.level > originalLevel;
 
+      // Check for new achievements
+      if (user) {
+        checkAndAwardAchievements(habits);
+      }
+
       // Trigger the special Victory Image on level up or major streak milestones
       if (leveledUp || STREAK_MILESTONES.includes(updatedHabit.currentStreak)) {
         setVictoryState({ isOpen: true, habitName: updatedHabit.name });
@@ -145,6 +151,9 @@ export default function Dashboard({ action, onActionComplete }: DashboardProps) 
       href: '/journal',
     },
   ];
+  
+  const totalLevel = habits.reduce((sum, habit) => sum + habit.level, 0);
+
 
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground p-4 md:p-6">
@@ -182,7 +191,7 @@ export default function Dashboard({ action, onActionComplete }: DashboardProps) 
           Hello, {user?.nickname}!
         </h1>
         <p className="text-center text-muted-foreground mb-8 text-sm md:text-base">
-          {activeHabits.length > 0 ? "Your daily progress is looking great. Keep it up!" : "You have no active habits. Go to settings to add some!"}
+          {activeHabits.length > 0 ? `Your Total Level is ${totalLevel}. Keep up the great work!` : "You have no active habits. Go to settings to add some!"}
         </p>
 
         <div className="mb-6 md:mb-8">

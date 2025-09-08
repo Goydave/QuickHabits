@@ -1,7 +1,10 @@
+
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import type { User, UserSettings } from '@/lib/types';
+import type { User, UserSettings, Habit } from '@/lib/types';
+import { ALL_ACHIEVEMENTS, checkAchievement } from '@/lib/achievements';
+import { toast } from 'sonner';
 
 const USER_STORAGE_KEY = 'quickhabits-user';
 
@@ -28,7 +31,8 @@ export function useUser() {
             settings: {
                 ...defaultSettings,
                 ...(parsedUser.settings || {})
-            }
+            },
+            achievements: parsedUser.achievements || [],
         };
         setUserState(userWithSettings);
          // Apply theme on initial load
@@ -49,12 +53,13 @@ export function useUser() {
 
       if (newUser) {
         // Ensure settings always have defaults
-        const userToSave = {
+        const userToSave: User = {
           ...newUser,
           settings: {
             ...defaultSettings,
             ...(newUser.settings || {})
-          }
+          },
+          achievements: newUser.achievements || [],
         };
         localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(userToSave));
         setUserState(userToSave);
@@ -83,5 +88,33 @@ export function useUser() {
     }
   }, []);
 
-  return { user, setUser, isLoading, clearUser };
+  const checkAndAwardAchievements = useCallback((habits: Habit[]) => {
+    if (!user) return;
+    
+    let newAchievements: string[] = [];
+
+    ALL_ACHIEVEMENTS.forEach(achievement => {
+        const alreadyUnlocked = user.achievements.includes(achievement.id);
+        if (!alreadyUnlocked && checkAchievement(achievement.id, habits)) {
+            newAchievements.push(achievement.id);
+            toast.success("Achievement Unlocked! 🏆", {
+                description: `You've earned the "${achievement.name}" badge.`,
+                action: {
+                    label: 'View Profile',
+                    onClick: () => window.location.href = '/profile'
+                }
+            });
+        }
+    });
+
+    if (newAchievements.length > 0) {
+        setUser({
+            ...user,
+            achievements: [...user.achievements, ...newAchievements],
+        });
+    }
+
+  }, [user, setUser]);
+
+  return { user, setUser, isLoading, clearUser, checkAndAwardAchievements };
 }

@@ -1,5 +1,4 @@
 
-
 import type { LucideProps } from 'lucide-react';
 import type { ForwardRefExoticComponent, RefAttributes } from 'react';
 
@@ -16,6 +15,7 @@ export type UserSettings = {
 export type User = {
   nickname: string;
   settings: UserSettings;
+  achievements: string[]; // array of achievement IDs
 };
 
 export type HabitType = 'build' | 'quit';
@@ -88,3 +88,16 @@ export type ReadingProgress = {
 export type ReadingProgressData = {
     [bookId: string]: ReadingProgress;
 };
+
+export type Achievement = {
+    id: string;
+    name: string;
+    description: string;
+    icon: Icon;
+}
+
+export type Avatar = {
+    name: string;
+    src: string;
+    minLevel: number;
+}
