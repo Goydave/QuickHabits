@@ -79,3 +79,4 @@ export default function ReadBookPage({ params }: { params: { id: string } }) {
         </div>
     );
 }
+
