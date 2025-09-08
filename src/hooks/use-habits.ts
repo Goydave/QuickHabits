@@ -1,9 +1,12 @@
+
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 import type { Habit } from '@/lib/types';
 import { PREDEFINED_HABITS, STREAK_MILESTONES } from '@/lib/constants';
 import { getLevelFromXp, XP_PER_CHECKIN, XP_PER_STREAK_MILESTONE } from '@/lib/game-mechanics';
+import { Sparkles } from 'lucide-react';
 
 const HABITS_STORAGE_KEY = 'quickhabits-habits';
 
@@ -21,8 +24,8 @@ export function useHabits() {
             const predefined = PREDEFINED_HABITS.find(p => p.id === habit.id);
             return { 
               ...habit, 
-              icon: predefined ? predefined.icon : () => null,
-              type: predefined ? (predefined.type || 'build') : 'build',
+              icon: predefined ? predefined.icon : Sparkles, // Use a default icon for custom habits
+              type: habit.type || 'build',
               xp: habit.xp || 0,
               level: habit.level || 1,
               isArchived: habit.isArchived || false,
@@ -108,21 +111,24 @@ export function useHabits() {
     return updatedHabit;
   }, [habits, setHabits]);
 
-  const addHabit = useCallback((habitId: string) => {
-    const predefinedHabit = PREDEFINED_HABITS.find(h => h.id === habitId);
-    if (!predefinedHabit) return;
-
-    const existingHabit = habits.find(h => h.id === habitId);
+  const addHabit = useCallback((habitData: {id?: string, name: string, type?: 'build' | 'quit'}) => {
+    const predefinedHabit = habitData.id ? PREDEFINED_HABITS.find(h => h.id === habitData.id) : null;
+    
+    const existingHabit = habits.find(h => h.name.toLowerCase() === habitData.name.toLowerCase());
     if (existingHabit) {
         // If habit exists and is archived, unarchive it
         if (existingHabit.isArchived) {
-            toggleHabitArchive(habitId);
+            toggleHabitArchive(existingHabit.id);
         }
         return;
     }
 
     const newHabit: Habit = {
-      ...predefinedHabit,
+      id: predefinedHabit ? predefinedHabit.id : uuidv4(),
+      name: predefinedHabit ? predefinedHabit.name : habitData.name,
+      icon: predefinedHabit ? predefinedHabit.icon : Sparkles, // Default icon for custom habits
+      specialAction: predefinedHabit ? predefinedHabit.specialAction : undefined,
+      type: habitData.type || 'build',
       currentStreak: 0,
       longestStreak: 0,
       lastCheckinDate: null,

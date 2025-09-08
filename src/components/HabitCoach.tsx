@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -5,23 +6,23 @@ import { motion } from 'framer-motion';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { suggestHabits, type HabitSuggestionOutput } from '@/ai/flows/habit-coach-flow';
-import { Loader2, Send } from 'lucide-react';
+import { Loader2, Send, Wand2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { PREDEFINED_HABITS } from '@/lib/constants';
-import HabitSelector from './HabitSelector';
-import type { PredefinedHabit } from '@/lib/types';
 import { Card, CardContent } from './ui/card';
 import { useHabits } from '@/hooks/use-habits';
+import type { SuggestedHabit } from '@/lib/types';
+import { Checkbox } from './ui/checkbox';
+import { Label } from './ui/label';
 
 type HabitCoachProps = {
-    onPlanReady: (selectedHabitIds: string[]) => void;
+    onPlanReady: (selectedHabits: {name: string}[]) => void;
 };
 
 export default function HabitCoach({ onPlanReady }: HabitCoachProps) {
     const [goal, setGoal] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [suggestion, setSuggestion] = useState<HabitSuggestionOutput | null>(null);
-    const [selectedHabits, setSelectedHabits] = useState<PredefinedHabit[]>([]);
+    const [selectedHabits, setSelectedHabits] = useState<SuggestedHabit[]>([]);
     const { habits } = useHabits();
 
     const handleGeneratePlan = async (e: React.FormEvent) => {
@@ -35,12 +36,7 @@ export default function HabitCoach({ onPlanReady }: HabitCoachProps) {
             const existingHabits = habits.map(h => ({ id: h.id, name: h.name }));
             const result = await suggestHabits({ goal, existingHabits });
             setSuggestion(result);
-            
-            // Pre-select the suggested habits
-            const suggestedPredefinedHabits = PREDEFINED_HABITS.filter(h => 
-                result.suggestedHabits.some(sh => sh.id === h.id)
-            );
-            setSelectedHabits(suggestedPredefinedHabits);
+            setSelectedHabits(result.suggestedHabits);
 
         } catch (error) {
             console.error("Failed to get habit suggestions:", error);
@@ -51,34 +47,29 @@ export default function HabitCoach({ onPlanReady }: HabitCoachProps) {
     };
     
     const handleStartJourney = () => {
-        onPlanReady(selectedHabits.map(h => h.id));
+        onPlanReady(selectedHabits);
     }
 
-    const suggestedPredefinedHabits = suggestion ? PREDEFINED_HABITS
-        .filter(h => suggestion.suggestedHabits.some(sh => sh.id === h.id))
-        // maintain order from AI
-        .sort((a, b) => {
-            const aIndex = suggestion.suggestedHabits.findIndex(sh => sh.id === a.id);
-            const bIndex = suggestion.suggestedHabits.findIndex(sh => sh.id === b.id);
-            return aIndex - bIndex;
-        }) : [];
-
-    const getReasonForHabit = (habitId: string) => {
-        return suggestion?.suggestedHabits.find(h => h.id === habitId)?.reason || '';
-    };
+    const handleToggleHabit = (habit: SuggestedHabit) => {
+        setSelectedHabits(prev => 
+            prev.some(h => h.name === habit.name) 
+                ? prev.filter(h => h.name !== habit.name) 
+                : [...prev, habit]
+        );
+    }
 
     return (
         <div className="space-y-4">
             <form onSubmit={handleGeneratePlan} className="flex items-center gap-2">
                 <Input
-                    placeholder="e.g., 'Be more productive'"
+                    placeholder="e.g., 'Become a great novelist'"
                     value={goal}
                     onChange={(e) => setGoal(e.target.value)}
                     disabled={isLoading || !!suggestion}
                     className="flex-grow"
                 />
                 <Button type="submit" size="icon" disabled={isLoading || !goal.trim() || !!suggestion}>
-                    {isLoading ? <Loader2 className="animate-spin" /> : <Send />}
+                    {isLoading ? <Loader2 className="animate-spin" /> : <Wand2 />}
                 </Button>
             </form>
 
@@ -94,32 +85,39 @@ export default function HabitCoach({ onPlanReady }: HabitCoachProps) {
                     </div>
 
                     <div className="space-y-3">
-                         {suggestedPredefinedHabits.map(habit => (
-                           <Card key={habit.id} className="p-3 bg-card">
-                             <div className="flex items-start gap-3">
-                                <div className="p-2 rounded-lg bg-primary/10 text-primary mt-1">
-                                    <habit.icon className="w-5 h-5" />
-                                </div>
-                                <div className='flex-1'>
-                                    <p className="font-semibold">{habit.name}</p>
-                                    <p className="text-sm text-muted-foreground">{getReasonForHabit(habit.id)}</p>
-                                </div>
-                             </div>
-                           </Card>
-                         ))}
+                         {suggestion.suggestedHabits.map((habit, index) => {
+                            const isSelected = selectedHabits.some(h => h.name === habit.name);
+                            return (
+                               <Label 
+                                 htmlFor={`habit-${index}`}
+                                 key={habit.name} 
+                                 className="block cursor-pointer"
+                               >
+                                 <Card 
+                                    className="p-3 bg-card has-[:checked]:ring-2 has-[:checked]:ring-primary has-[:checked]:border-primary"
+                                  >
+                                   <div className="flex items-start gap-3">
+                                      <span className="p-2 rounded-lg bg-primary/10 text-primary mt-1 text-xl">
+                                          {habit.emoji}
+                                      </span>
+                                      <div className='flex-1'>
+                                          <p className="font-semibold">{habit.name}</p>
+                                          <p className="text-sm text-muted-foreground">{habit.reason}</p>
+                                      </div>
+                                      <Checkbox 
+                                          id={`habit-${index}`}
+                                          checked={isSelected}
+                                          onCheckedChange={() => handleToggleHabit(habit)}
+                                          className="mt-1"
+                                      />
+                                   </div>
+                                 </Card>
+                               </Label>
+                            )
+                         })}
                     </div>
                     
-                    <p className="text-xs text-center text-muted-foreground pt-2">You can stick with this plan or customize it below.</p>
-
-                    <Card>
-                        <CardContent className="p-4">
-                             <HabitSelector
-                                predefinedHabits={PREDEFINED_HABITS}
-                                selectedHabits={selectedHabits}
-                                onSelectionChange={setSelectedHabits}
-                            />
-                        </CardContent>
-                    </Card>
+                    <p className="text-xs text-center text-muted-foreground pt-2">You can uncheck any habits you don't want to start with.</p>
 
                     <Button onClick={handleStartJourney} className="w-full" disabled={selectedHabits.length === 0}>
                         Start My Journey with {selectedHabits.length} {selectedHabits.length === 1 ? 'Habit' : 'Habits'}

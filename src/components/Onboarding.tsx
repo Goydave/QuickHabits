@@ -1,10 +1,10 @@
 
+
 'use client';
 
 import { useState } from 'react';
 import { useUser } from '@/hooks/use-user';
 import { useHabits } from '@/hooks/use-habits';
-import { PREDEFINED_HABITS } from '@/lib/constants';
 import type { Habit } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -17,7 +17,7 @@ import ManualHabitSelector from './ManualHabitSelector';
 
 export default function Onboarding() {
   const { setUser } = useUser();
-  const { setHabits } = useHabits();
+  const { addHabit } = useHabits();
   const [step, setStep] = useState(1);
   const [nickname, setNickname] = useState('');
 
@@ -33,24 +33,13 @@ export default function Onboarding() {
     }
   };
 
-  const handleStartJourney = (selectedHabitIds: string[]) => {
-    if (selectedHabitIds.length === 0) {
+  const handleStartJourney = (selectedHabits: {name: string}[]) => {
+    if (selectedHabits.length === 0) {
       return;
     }
-    const newHabits: Habit[] = PREDEFINED_HABITS
-        .filter(h => selectedHabitIds.includes(h.id))
-        .map(h => ({
-            ...h,
-            currentStreak: 0,
-            longestStreak: 0,
-            lastCheckinDate: null,
-            checkinHistory: [],
-            xp: 0,
-            level: 1,
-            isArchived: false,
-        }));
+    
+    selectedHabits.forEach(habit => addHabit({ name: habit.name }));
 
-    setHabits(newHabits);
     // Force a full page reload to ensure the new state is recognized
     // and the user is redirected to the dashboard correctly.
     window.location.href = '/';
@@ -129,7 +118,7 @@ export default function Onboarding() {
                 <CardDescription>Select the habits you want to track. You can change these later in settings.</CardDescription>
               </CardHeader>
               <CardContent>
-                <ManualHabitSelector onPlanReady={handleStartJourney} />
+                <ManualHabitSelector onPlanReady={(ids) => handleStartJourney(ids.map(id => ({ name: id})))} />
               </CardContent>
                <CardFooter>
                   <Button variant="ghost" className="w-full" onClick={() => setStep(1)}>

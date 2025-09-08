@@ -1,4 +1,5 @@
 
+
 import type { LucideProps } from 'lucide-react';
 import type { ForwardRefExoticComponent, RefAttributes } from 'react';
 
@@ -21,6 +22,7 @@ export type HabitType = 'build' | 'quit';
 
 export type SpecialAction = 'audio-journal' | 'audio-meditation';
 
+// Represents a habit from the initial, predefined list
 export type PredefinedHabit = {
   id: string;
   name: string;
@@ -29,11 +31,26 @@ export type PredefinedHabit = {
   type?: HabitType;
 };
 
+// Represents a new habit suggested by the AI, which may not exist in the predefined list
+export type SuggestedHabit = {
+  name: string;
+  reason: string;
+  emoji: string;
+  // Custom habits don't have a predefined ID or icon component
+}
+
 export type Checkin = {
     date: string; // YYYY-MM-DD
 }
 
-export type Habit = PredefinedHabit & {
+// Represents a habit that the user is actively tracking.
+// It can be from the predefined list or a custom one.
+export type Habit = {
+  id: string;
+  name: string;
+  icon: Icon;
+  specialAction?: SpecialAction;
+  type?: HabitType;
   currentStreak: number;
   longestStreak: number;
   lastCheckinDate: string | null;
