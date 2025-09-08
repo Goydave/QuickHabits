@@ -72,14 +72,37 @@ export const AVATARS: Avatar[] = [
     { name: 'Guardian', src: 'https://picsum.photos/128/128?random=5', minLevel: 100 },
 ];
 
-export const getAvatarByLevel = (totalLevel: number): Avatar => {
-    let currentAvatar = AVATARS[0];
-    for (const avatar of AVATARS) {
-        if (totalLevel >= avatar.minLevel) {
-            currentAvatar = avatar;
+type AvatarInfo = {
+    avatar: Avatar;
+    nextAvatar: Avatar | null;
+    progressToNextAvatar: number;
+}
+
+export const getAvatarByLevel = (totalLevel: number): AvatarInfo => {
+    let currentAvatar: Avatar = AVATARS[0];
+    let nextAvatar: Avatar | null = null;
+    let progress = 0;
+
+    for (let i = 0; i < AVATARS.length; i++) {
+        if (totalLevel >= AVATARS[i].minLevel) {
+            currentAvatar = AVATARS[i];
         } else {
+            nextAvatar = AVATARS[i];
             break;
         }
     }
-    return currentAvatar;
+
+    if (nextAvatar) {
+        const levelRange = nextAvatar.minLevel - currentAvatar.minLevel;
+        const progressInLevel = totalLevel - currentAvatar.minLevel;
+        progress = (progressInLevel / levelRange) * 100;
+    } else {
+        progress = 100; // Max level reached
+    }
+
+    return {
+        avatar: currentAvatar,
+        nextAvatar: nextAvatar,
+        progressToNextAvatar: progress
+    };
 };
