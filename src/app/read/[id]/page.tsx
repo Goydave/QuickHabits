@@ -1,16 +1,19 @@
 
+'use client';
 import { LIBRARY_BOOKS } from '@/lib/library-books';
 import { notFound } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { ArrowLeft, Loader2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import BookReader from '@/components/BookReader';
 
 async function getBookContent(url: string) {
     try {
-        const response = await fetch(url, { cache: 'force-cache' });
+        // Use a proxy to bypass CORS issues if running locally
+        const response = await fetch(url);
         if (!response.ok) {
-            throw new Error('Failed to fetch book content');
+            throw new Error(`Failed to fetch book content: ${response.statusText}`);
         }
         const text = await response.text();
         return text;
@@ -20,18 +23,43 @@ async function getBookContent(url: string) {
     }
 }
 
-export default async function ReadBookPage({ params }: { params: { id: string } }) {
+export default function ReadBookPage({ params }: { params: { id: string } }) {
+    const [bookContent, setBookContent] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     const book = LIBRARY_BOOKS.find((b) => b.id === params.id);
 
-    if (!book) {
-        notFound();
-    }
+    useEffect(() => {
+        if (!book) {
+            notFound();
+            return;
+        }
 
-    const bookContent = await getBookContent(book.url);
+        const fetchContent = async () => {
+            setIsLoading(true);
+            setError(null);
+            try {
+                const content = await getBookContent(book.url);
+                setBookContent(content);
+            } catch (e: any) {
+                setError(e.message || "Failed to load book.");
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchContent();
+    }, [book]);
+
+
+    if (!book) {
+        // This will be caught by the useEffect, but as a fallback
+        return notFound();
+    }
 
     return (
         <div className="flex flex-col h-screen bg-background text-foreground">
-            <header className="flex items-center justify-between p-4 border-b">
+            <header className="flex items-center justify-between p-4 border-b z-10 bg-background/80 backdrop-blur-sm sticky top-0">
                  <div className="flex items-center gap-4">
                      <Button asChild variant="ghost" size="icon">
                         <Link href="/library">
@@ -40,19 +68,25 @@ export default async function ReadBookPage({ params }: { params: { id: string } 
                         </Link>
                     </Button>
                     <div className="flex flex-col">
-                        <h1 className="text-xl font-bold font-headline">{book.title}</h1>
+                        <h1 className="text-xl font-bold font-headline truncate">{book.title}</h1>
                         <p className="text-sm text-muted-foreground">{book.author}</p>
                     </div>
                 </div>
             </header>
             <main className="flex-grow overflow-hidden">
-                <ScrollArea className="h-full px-4 md:px-8 lg:px-12 py-6">
-                    <div className="prose prose-lg dark:prose-invert max-w-full">
-                       <pre className="whitespace-pre-wrap font-body text-base">
-                           {bookContent}
-                       </pre>
+                 {isLoading && (
+                    <div className="flex justify-center items-center h-full">
+                        <Loader2 className="w-12 h-12 animate-spin text-primary" />
                     </div>
-                </ScrollArea>
+                 )}
+                 {error && (
+                    <div className="flex justify-center items-center h-full text-destructive p-8 text-center">
+                        <p>Error loading book content: {error}</p>
+                    </div>
+                 )}
+                 {!isLoading && !error && bookContent && (
+                    <BookReader bookId={book.id} content={bookContent} />
+                 )}
             </main>
         </div>
     );

@@ -6,7 +6,7 @@ import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowLeft, Search, Heart } from 'lucide-react';
+import { ArrowLeft, Search, Heart, Star } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { LIBRARY_BOOKS } from '@/lib/library-books';
 import { Input } from '@/components/ui/input';
@@ -14,10 +14,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useLibrary } from '@/hooks/use-library';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { useReadingProgress } from '@/hooks/use-reading-progress';
+import { Progress } from '@/components/ui/progress';
 
 export default function LibraryPage() {
     const [searchTerm, setSearchTerm] = useState('');
-    const { favoriteBookIds, addFavorite, removeFavorite, isLoading } = useLibrary();
+    const { favoriteBookIds, addFavorite, removeFavorite } = useLibrary();
+    const { recentlyRead } = useReadingProgress();
 
     const handleFavoriteToggle = (bookId: string, bookTitle: string) => {
         if (favoriteBookIds.includes(bookId)) {
@@ -36,12 +39,20 @@ export default function LibraryPage() {
 
     const favoriteBooks = filteredBooks.filter(book => favoriteBookIds.includes(book.id));
 
-    const BookCard = ({ book }: { book: typeof LIBRARY_BOOKS[0] }) => {
+    const continueReadingBooks = recentlyRead
+        .map(progress => {
+            const book = LIBRARY_BOOKS.find(b => b.id === progress.bookId);
+            return book ? { ...book, progress: progress.scrollPercentage } : null;
+        })
+        .filter(Boolean);
+
+
+    const BookCard = ({ book, progress }: { book: typeof LIBRARY_BOOKS[0], progress?: number }) => {
         const isFavorite = favoriteBookIds.includes(book.id);
         return (
             <div className="relative group">
                 <Link href={`/read/${book.id}`} key={book.id} className="block transform hover:scale-105 transition-transform duration-300">
-                    <Card className="flex flex-col h-full">
+                    <Card className="flex flex-col h-full overflow-hidden">
                         <CardHeader className="p-0">
                             <Image
                                 src={book.coverUrl}
@@ -52,9 +63,15 @@ export default function LibraryPage() {
                                 data-ai-hint="book cover"
                             />
                         </CardHeader>
-                        <CardContent className="flex-grow p-4">
-                            <h2 className="font-bold text-lg">{book.title}</h2>
-                            <p className="text-sm text-muted-foreground">{book.author}</p>
+                        <CardContent className="flex-grow p-3">
+                            <h2 className="font-bold text-base truncate">{book.title}</h2>
+                            <p className="text-sm text-muted-foreground truncate">{book.author}</p>
+                            {progress !== undefined && (
+                                <div className="mt-2">
+                                    <Progress value={progress} className="h-1" />
+                                    <p className="text-xs text-muted-foreground mt-1">{Math.round(progress)}% read</p>
+                                </div>
+                            )}
                         </CardContent>
                     </Card>
                 </Link>
@@ -75,7 +92,7 @@ export default function LibraryPage() {
     return (
         <div className="flex flex-col min-h-screen bg-background text-foreground p-4 md:p-6">
             <Header />
-            <main className="flex-grow pt-8 max-w-6xl mx-auto w-full">
+            <main className="flex-grow pt-8 max-w-7xl mx-auto w-full">
                 <div className="flex items-center mb-6">
                     <Button asChild variant="ghost" size="icon" className="mr-2">
                         <Link href="/">
@@ -86,6 +103,15 @@ export default function LibraryPage() {
                         Virtual Library
                     </h1>
                 </div>
+
+                {continueReadingBooks.length > 0 && (
+                    <section className="mb-12">
+                         <h2 className="text-2xl font-bold font-headline mb-6">Continue Reading</h2>
+                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
+                             {continueReadingBooks.map(book => book && <BookCard key={`continue-${book.id}`} book={book} progress={book.progress}/>)}
+                         </div>
+                    </section>
+                )}
 
 
                 <Tabs defaultValue="all">
@@ -108,7 +134,7 @@ export default function LibraryPage() {
 
                     <TabsContent value="all">
                         {filteredBooks.length > 0 ? (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
                                 {filteredBooks.map((book) => <BookCard key={book.id} book={book} />)}
                             </div>
                         ) : (
@@ -122,12 +148,13 @@ export default function LibraryPage() {
                     </TabsContent>
                     <TabsContent value="favorites">
                          {favoriteBooks.length > 0 ? (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
                                 {favoriteBooks.map((book) => <BookCard key={book.id} book={book} />)}
                             </div>
                         ) : (
                             <div className="text-center py-16">
-                                <h2 className="text-2xl font-semibold">No Favorite Books Yet</h2>
+                                <Star className="mx-auto h-12 w-12 text-muted-foreground" />
+                                <h2 className="text-2xl font-semibold mt-4">No Favorite Books Yet</h2>
                                 <p className="text-muted-foreground mt-2">
                                     Click the heart icon on any book to add it to your favorites.
                                 </p>

@@ -62,3 +62,12 @@ export type Favorite = {
     bookId: string;
     addedAt: string; // ISO String
 };
+
+export type ReadingProgress = {
+    scrollPercentage: number;
+    lastReadDate: string; // ISO String
+};
+
+export type ReadingProgressData = {
+    [bookId: string]: ReadingProgress;
+};
