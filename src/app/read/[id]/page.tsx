@@ -37,7 +37,7 @@ export default function ReadBookPage({ params }: { params: { id: string } }) {
         };
 
         fetchContent();
-    }, [book]);
+    }, [book, id]);
 
 
     if (!book) {
