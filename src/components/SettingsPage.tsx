@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -80,7 +81,7 @@ export default function SettingsPage() {
 
     // Add new habits
     const habitsToAdd = selected.filter(h => !currentHabitIds.includes(h.id));
-    habitsToAdd.forEach(habit => addHabit(habit.id));
+    habitsToAdd.forEach(habit => addHabit({id: habit.id, name: habit.name}));
 
     // Re-activate archived habits if they are selected again
     const habitsToReactivate = habits.filter(h => h.isArchived && selectedHabitIds.includes(h.id));

@@ -1,3 +1,4 @@
+
 'use client';
 
 import { generateAudioJournalingPrompt } from '@/ai/flows/audio-journal-flow';
