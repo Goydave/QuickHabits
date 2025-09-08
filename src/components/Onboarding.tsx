@@ -1,11 +1,9 @@
-
-
 'use client';
 
 import { useState } from 'react';
 import { useUser } from '@/hooks/use-user';
 import { useHabits } from '@/hooks/use-habits';
-import type { Habit } from '@/lib/types';
+import type { Habit, SuggestedHabit } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -33,7 +31,7 @@ export default function Onboarding() {
     }
   };
 
-  const handleStartJourney = (selectedHabits: {name: string}[]) => {
+  const handleStartJourney = (selectedHabits: SuggestedHabit[]) => {
     if (selectedHabits.length === 0) {
       return;
     }
@@ -44,6 +42,14 @@ export default function Onboarding() {
     // and the user is redirected to the dashboard correctly.
     window.location.href = '/';
   };
+
+  const handleManualStartJourney = (selectedHabitIds: string[]) => {
+     if (selectedHabitIds.length === 0) {
+      return;
+    }
+    selectedHabitIds.forEach(id => addHabit({ id: id, name: '' })); // name can be empty as it will be looked up by id
+     window.location.href = '/';
+  }
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-background p-4">
@@ -118,7 +124,7 @@ export default function Onboarding() {
                 <CardDescription>Select the habits you want to track. You can change these later in settings.</CardDescription>
               </CardHeader>
               <CardContent>
-                <ManualHabitSelector onPlanReady={(ids) => handleStartJourney(ids.map(id => ({ name: id})))} />
+                <ManualHabitSelector onPlanReady={handleManualStartJourney} />
               </CardContent>
                <CardFooter>
                   <Button variant="ghost" className="w-full" onClick={() => setStep(1)}>
