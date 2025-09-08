@@ -1,3 +1,4 @@
+
 import type { LucideProps } from 'lucide-react';
 import type { ForwardRefExoticComponent, RefAttributes } from 'react';
 
@@ -55,4 +56,9 @@ export type JournalEntry = {
     date: string; // ISO String
     mood?: 'happy' | 'sad' | 'neutral' | 'excited' | 'calm';
     linkedBookId?: string;
+};
+
+export type Favorite = {
+    bookId: string;
+    addedAt: string; // ISO String
 };
