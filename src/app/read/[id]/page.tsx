@@ -7,21 +7,8 @@ import Link from 'next/link';
 import { ArrowLeft, Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import BookReader from '@/components/BookReader';
+import { getBookContent } from './actions';
 
-async function getBookContent(url: string) {
-    try {
-        // Use a proxy to bypass CORS issues if running locally
-        const response = await fetch(url);
-        if (!response.ok) {
-            throw new Error(`Failed to fetch book content: ${response.statusText}`);
-        }
-        const text = await response.text();
-        return text;
-    } catch (error) {
-        console.error("Error fetching book:", error);
-        return "Could not load book content. Please try again later.";
-    }
-}
 
 export default function ReadBookPage({ params }: { params: { id: string } }) {
     const [bookContent, setBookContent] = useState<string | null>(null);
