@@ -46,11 +46,18 @@ export function useReadingProgress() {
         return progress[bookId] || null;
     }, [progress]);
 
+    const removeReadingProgress = useCallback((bookId: string) => {
+        const newProgress = { ...progress };
+        delete newProgress[bookId];
+        setProgress(newProgress);
+    }, [progress, setProgress]);
+
+
     const recentlyRead = Object.entries(progress)
         .map(([bookId, data]) => ({ bookId, ...data }))
         .sort((a, b) => new Date(b.lastReadDate).getTime() - new Date(a.lastReadDate).getTime())
         .slice(0, 6); // Get the 6 most recently read books
 
 
-    return { progress, saveReadingProgress, getReadingProgress, recentlyRead, isLoading };
+    return { progress, saveReadingProgress, getReadingProgress, removeReadingProgress, recentlyRead, isLoading };
 }

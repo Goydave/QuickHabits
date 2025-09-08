@@ -6,7 +6,7 @@ import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowLeft, Search, Heart, Star } from 'lucide-react';
+import { ArrowLeft, Search, Heart, Star, X } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { LIBRARY_BOOKS } from '@/lib/library-books';
 import { Input } from '@/components/ui/input';
@@ -20,7 +20,7 @@ import { Progress } from '@/components/ui/progress';
 export default function LibraryPage() {
     const [searchTerm, setSearchTerm] = useState('');
     const { favoriteBookIds, addFavorite, removeFavorite } = useLibrary();
-    const { recentlyRead } = useReadingProgress();
+    const { recentlyRead, removeReadingProgress } = useReadingProgress();
 
     const handleFavoriteToggle = (bookId: string, bookTitle: string) => {
         if (favoriteBookIds.includes(bookId)) {
@@ -30,6 +30,11 @@ export default function LibraryPage() {
             addFavorite(bookId);
             toast.success(`"${bookTitle}" added to favorites!`);
         }
+    };
+
+    const handleRemoveFromContinueReading = (bookId: string, bookTitle: string) => {
+        removeReadingProgress(bookId);
+        toast.info(`Removed "${bookTitle}" from your continue reading list.`);
     };
 
     const filteredBooks = LIBRARY_BOOKS.filter(book =>
@@ -47,7 +52,7 @@ export default function LibraryPage() {
         .filter(Boolean);
 
 
-    const BookCard = ({ book, progress }: { book: typeof LIBRARY_BOOKS[0], progress?: number }) => {
+    const BookCard = ({ book, progress, showRemoveContinue, showRemoveFavorite }: { book: typeof LIBRARY_BOOKS[0], progress?: number, showRemoveContinue?: boolean, showRemoveFavorite?: boolean }) => {
         const isFavorite = favoriteBookIds.includes(book.id);
         return (
             <div className="relative group">
@@ -84,6 +89,21 @@ export default function LibraryPage() {
                     <Heart className={cn("w-5 h-5", isFavorite ? 'fill-current' : 'fill-none')} />
                     <span className="sr-only">Favorite</span>
                 </Button>
+                 {(showRemoveContinue || showRemoveFavorite) &&
+                    <Button
+                        size="icon"
+                        variant="destructive"
+                        className="absolute bottom-2 right-2 rounded-full h-7 w-7 opacity-80 group-hover:opacity-100"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            if(showRemoveContinue) handleRemoveFromContinueReading(book.id, book.title)
+                            if(showRemoveFavorite) removeFavorite(book.id);
+                        }}
+                    >
+                        <X className="w-4 h-4" />
+                        <span className="sr-only">Remove</span>
+                    </Button>
+                }
             </div>
         );
     };
@@ -108,7 +128,7 @@ export default function LibraryPage() {
                     <section className="mb-12">
                          <h2 className="text-2xl font-bold font-headline mb-6">Continue Reading</h2>
                          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
-                             {continueReadingBooks.map(book => book && <BookCard key={`continue-${book.id}`} book={book} progress={book.progress}/>)}
+                             {continueReadingBooks.map(book => book && <BookCard key={`continue-${book.id}`} book={book} progress={book.progress} showRemoveContinue={true} />)}
                          </div>
                     </section>
                 )}
@@ -149,7 +169,7 @@ export default function LibraryPage() {
                     <TabsContent value="favorites">
                          {favoriteBooks.length > 0 ? (
                             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
-                                {favoriteBooks.map((book) => <BookCard key={book.id} book={book} />)}
+                                {favoriteBooks.map((book) => <BookCard key={book.id} book={book} showRemoveFavorite={true}/>)}
                             </div>
                         ) : (
                             <div className="text-center py-16">
