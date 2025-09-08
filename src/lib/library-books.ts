@@ -1009,7 +1009,7 @@ export const LIBRARY_BOOKS: LibraryBook[] = [
         title: 'The Shape of Things to Come',
         author: 'H. G. Wells',
         coverUrl: 'https://picsum.photos/300/400?random=149',
-        url: 'https://www_gutenberg.org/files/59774/59774-0.txt',
+        url: 'https://www.gutenberg.org/files/59774/59774-0.txt',
     },
     {
         id: '2236',
@@ -1030,7 +1030,7 @@ export const LIBRARY_BOOKS: LibraryBook[] = [
         title: 'The World Set Free',
         author: 'H. G. Wells',
         coverUrl: 'https://picsum.photos/300/400?random=152',
-        url: 'https://www_gutenberg.org/files/59775/59775-0.txt',
+        url: 'https://www.gutenberg.org/files/59775/59775-0.txt',
     },
     {
         id: '644',
@@ -1590,7 +1590,7 @@ export const LIBRARY_BOOKS: LibraryBook[] = [
         title: 'The Sorrows of Young Werther',
         author: 'Johann Wolfgang von Goethe',
         coverUrl: 'https://picsum.photos/300/400?random=232',
-        url: 'https://www_gutenberg.org/files/408/408-0.txt',
+        url: 'https://www.gutenberg.org/files/408/408-0.txt',
     },
     {
         id: '2989',
