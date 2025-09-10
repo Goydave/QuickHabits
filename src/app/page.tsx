@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useEffect, useState, Suspense } from 'react';
@@ -5,7 +6,7 @@ import { useSearchParams } from 'next/navigation';
 import { useUser } from '@/hooks/use-user';
 import { useHabits } from '@/hooks/use-habits';
 import Onboarding from '@/components/Onboarding';
-import Dashboard from '@/components/Dashboard';
+import Dashboard from '@/app/dashboard/page';
 import SplashScreen from '@/components/SplashScreen';
 
 function HomePageContent() {

@@ -24,7 +24,7 @@ type DashboardProps = {
   onActionComplete?: () => void;
 }
 
-export default function Dashboard({ action, onActionComplete }: DashboardProps) {
+export default function DashboardComponent({ action, onActionComplete }: DashboardProps) {
   const { user, checkAndAwardAchievements } = useUser();
   const { habits, checkIn } = useHabits();
   const [showConfetti, setShowConfetti] = useState(false);
