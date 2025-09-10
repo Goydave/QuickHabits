@@ -18,7 +18,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Library, BookMarked, Check, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
-import DashboardComponent from '@/components/Dashboard';
 
 type DashboardProps = {
   action?: string | null;
@@ -250,3 +249,5 @@ export default function Dashboard({ action, onActionComplete }: DashboardProps) 
     </div>
   );
 }
+
+    

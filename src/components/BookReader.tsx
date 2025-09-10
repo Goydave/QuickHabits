@@ -44,3 +44,5 @@ export default function BookReader({ bookId, content }: BookReaderProps) {
     </ScrollArea>
   );
 }
+
+    

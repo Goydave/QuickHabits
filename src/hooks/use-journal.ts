@@ -51,3 +51,5 @@ export function useJournal() {
 
     return { entries, addEntry, isLoading };
 }
+
+    

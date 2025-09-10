@@ -127,7 +127,7 @@ export const LIBRARY_BOOKS: LibraryBook[] = [
         title: 'The War of the Worlds',
         author: 'H.G. Wells',
         coverUrl: 'https://picsum.photos/300/400?random=24',
-        url: 'https://www.gutenberg.org/files/36/36-0.txt',
+        url: 'https://wwwgutenberg.org/files/36/36-0.txt',
     },
     {
         id: '25344',
@@ -2811,3 +2811,5 @@ export const LIBRARY_BOOKS: LibraryBook[] = [
         url: 'https://www.gutenberg.org/cache/epub/286/pg286.txt'
     }
 ];
+
+    

@@ -1,3 +1,4 @@
+
 'use server';
 
 export async function getBookContent(url: string) {
@@ -17,3 +18,5 @@ export async function getBookContent(url: string) {
         throw new Error("Could not load book content due to an unknown error.");
     }
 }
+
+    

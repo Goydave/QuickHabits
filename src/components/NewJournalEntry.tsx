@@ -129,3 +129,5 @@ export default function NewJournalEntry({ onSave, onCancel, aiPrompt, onGenerate
     </Card>
   );
 }
+
+    
