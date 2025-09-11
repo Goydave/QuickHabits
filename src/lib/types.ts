@@ -102,4 +102,13 @@ export type Avatar = {
     minLevel: number;
 }
 
-    
+export type WeeklyGoalStep = {
+    text: string;
+    isCompleted: boolean;
+};
+
+export type WeeklyGoal = {
+    text: string;
+    steps: WeeklyGoalStep[];
+    weekNumber: number;
+};

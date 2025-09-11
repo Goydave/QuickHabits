@@ -41,7 +41,7 @@ const InternalHabitSchema = z.object({
 const DailyFocusInputSchema = z.object({
   habits: z.array(InternalHabitSchema).describe("The user's list of active habits, augmented with level-up data."),
 });
-export type DailyFocusInput = z.infer<typeof DailyFocusInputSchema>;
+type DailyFocusInput = z.infer<typeof DailyFocusInputSchema>;
 
 
 const DailyFocusOutputSchema = z.object({
