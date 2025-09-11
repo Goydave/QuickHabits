@@ -21,7 +21,7 @@ export function useHabits() {
         const parsedHabits: Habit[] = JSON.parse(storedHabits);
         // Re-hydrate icon components and ensure defaults
         const habitsWithIcons = parsedHabits.map(habit => {
-            const predefined = PREDEFINED_HABITS.find(p => p.id === habit.id);
+            const predefined = PREDEFINED_HABITS.find(p => p.id === habit.id || p.name === habit.name);
             return { 
               ...habit, 
               icon: predefined ? predefined.icon : Sparkles, // Use a default icon for custom habits
@@ -112,7 +112,7 @@ export function useHabits() {
   }, [habits, setHabits]);
 
   const addHabit = useCallback((habitData: {id?: string, name: string, type?: 'build' | 'quit'}) => {
-    const predefinedHabit = habitData.id ? PREDEFINED_HABITS.find(h => h.id === habitData.id) : null;
+    const predefinedHabit = habitData.id ? PREDEFINED_HABITS.find(h => h.id === habitData.id) : PREDEFINED_HABITS.find(h => h.name === habitData.name);
     
     const existingHabit = habits.find(h => h.name.toLowerCase() === habitData.name.toLowerCase());
     if (existingHabit) {

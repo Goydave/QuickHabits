@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -22,7 +23,7 @@ export default function Onboarding() {
   const handleNextStep = (e: React.FormEvent) => {
     e.preventDefault();
     if (nickname.trim()) {
-      setUser({ nickname, settings: { enableMotivation: true, coachingStyle: 'encouraging', colorTheme: 'theme-amber' } });
+      setUser({ nickname, settings: { enableMotivation: true, coachingStyle: 'encouraging', colorTheme: 'theme-amber' }, achievements: [] });
       if (typeof window !== 'undefined' && navigator.onLine) {
         setStep(2); // AI Coach step
       } else {
@@ -103,7 +104,10 @@ export default function Onboarding() {
               <CardContent>
                 <HabitCoach onPlanReady={handleStartJourney} />
               </CardContent>
-               <CardFooter>
+               <CardFooter className='flex-col gap-2'>
+                  <Button variant="link" className="w-full" onClick={() => setStep(3)}>
+                    I want to pick my own habits
+                 </Button>
                   <Button variant="ghost" className="w-full" onClick={() => setStep(1)}>
                     Back
                  </Button>
