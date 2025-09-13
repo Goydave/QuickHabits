@@ -2,10 +2,21 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Loader2, Send, Sparkles, User, Bot } from 'lucide-react';
+import { Loader2, Send, Sparkles, User, Bot, Trash } from 'lucide-react';
 import { ChatMessage } from '@/lib/types';
 import { getGoalCoaching } from '@/ai/flows/goal-coach-flow';
 import { toast } from 'sonner';
@@ -16,6 +27,8 @@ import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback } from './ui/avatar';
 
 const STORAGE_KEY = 'quickhabits-goal-coach-chat';
+const INITIAL_MESSAGE: ChatMessage = { id: uuidv4(), role: 'ai', content: "I'm Sparky, your AI Goal Coach! Tell me about an ambition you have, and I'll help you break it down into actionable steps. What's on your mind? ✨" };
+
 
 export default function GoalCoach() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -29,9 +42,7 @@ export default function GoalCoach() {
       setMessages(JSON.parse(storedChat));
     } else {
         // Initial AI message
-        setMessages([
-            { id: uuidv4(), role: 'ai', content: "I'm Sparky, your AI Goal Coach! Tell me about an ambition you have, and I'll help you break it down into actionable steps. What's on your mind? ✨" }
-        ]);
+        setMessages([INITIAL_MESSAGE]);
     }
   }, []);
 
@@ -71,19 +82,54 @@ export default function GoalCoach() {
     } catch (error) {
       console.error('AI Goal Coach failed:', error);
       toast.error("I'm having a little trouble thinking right now. Please try again in a moment.");
+      // Rollback user message on failure
+      saveMessages(newMessages.slice(0, -1));
     } finally {
       setIsLoading(false);
     }
   };
 
+  const handleClearHistory = () => {
+    localStorage.removeItem(STORAGE_KEY);
+    setMessages([INITIAL_MESSAGE]);
+    toast.success("Chat history cleared!");
+  }
+
   return (
     <Card className="shadow-lg flex flex-col h-[60vh] max-h-[700px]">
-      <CardHeader>
-        <CardTitle className="font-headline text-lg flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-primary"/>
-            AI Goal Coach
-        </CardTitle>
-        <CardDescription>Your personal AI companion for planning and achieving your ambitions.</CardDescription>
+      <CardHeader className="flex flex-row justify-between items-start">
+        <div>
+            <CardTitle className="font-headline text-lg flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-primary"/>
+                AI Goal Coach
+            </CardTitle>
+            <CardDescription>Your personal AI companion for planning and achieving your ambitions.</CardDescription>
+        </div>
+         <AlertDialog>
+            <AlertDialogTrigger asChild>
+                <Button variant="ghost" size="icon" disabled={messages.length <= 1}>
+                    <Trash className="w-4 h-4" />
+                    <span className="sr-only">Clear History</span>
+                </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+                <AlertDialogHeader>
+                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                    This action cannot be undone. This will permanently delete your entire conversation history with the Goal Coach.
+                </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                    onClick={handleClearHistory}
+                    className="bg-destructive hover:bg-destructive/90"
+                >
+                    Clear History
+                </AlertDialogAction>
+                </AlertDialogFooter>
+            </AlertDialogContent>
+        </AlertDialog>
       </CardHeader>
       <CardContent className="flex-grow overflow-hidden flex flex-col gap-4">
         <ScrollArea className="flex-grow pr-4 -mr-4" viewportRef={scrollAreaRef}>

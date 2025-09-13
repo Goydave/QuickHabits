@@ -96,6 +96,11 @@ export default function SettingsPage() {
     window.location.href = '/';
   }
 
+  const handleClearChatHistory = () => {
+    localStorage.removeItem('quickhabits-goal-coach-chat');
+    toast.success("Goal Coach chat history cleared!");
+  }
+
   // Habits selected in the "Add New" tab should include active and archived ones
   const selectedPredefinedHabits = PREDEFINED_HABITS.filter(ph => 
     habits.some(h => h.id === ph.id)
@@ -317,16 +322,38 @@ export default function SettingsPage() {
           <CardTitle className="text-destructive">Danger Zone</CardTitle>
           <CardDescription>These actions are permanent and cannot be undone.</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="flex flex-col items-start gap-4">
+            <AlertDialog>
+                <AlertDialogTrigger asChild>
+                <Button variant="destructive">Clear Goal Coach History</Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                <AlertDialogHeader>
+                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                    This will permanently delete your entire conversation history with the Goal Coach.
+                    </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                    onClick={handleClearChatHistory}
+                    className="bg-destructive hover:bg-destructive/90"
+                    >
+                    Continue
+                    </AlertDialogAction>
+                </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button variant="destructive">Reset Account</Button>
+              <Button variant="destructive" className='outline'>Reset All Data</Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
                 <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  This action cannot be undone. This will permanently delete all your habit data and streaks.
+                  This action cannot be undone. This will permanently delete all your habit data, journal entries, and achievements, and will reset the app to its initial state.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
