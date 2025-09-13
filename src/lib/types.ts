@@ -112,3 +112,9 @@ export type WeeklyGoal = {
     steps: WeeklyGoalStep[];
     weekNumber: number;
 };
+
+export type ChatMessage = {
+    id: string;
+    role: 'user' | 'ai';
+    content: string;
+}

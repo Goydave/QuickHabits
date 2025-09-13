@@ -10,3 +10,5 @@ import '@/ai/flows/audio-meditation-flow.ts';
 import '@/ai/flows/daily-focus-flow.ts';
 import '@/ai/flows/image-generator-flow.ts';
 import '@/ai/flows/weekly-goal-flow.ts';
+import '@/ai/flows/goal-coach-flow.ts';
+

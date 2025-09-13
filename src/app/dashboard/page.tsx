@@ -18,7 +18,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Library, BookMarked, Check, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
-import WeeklyGoal from '@/components/WeeklyGoal';
+import GoalCoach from '@/components/GoalCoach';
 
 type DashboardProps = {
   action?: string | null;
@@ -248,8 +248,7 @@ export default function Dashboard({ action, onActionComplete }: DashboardProps) 
         </div>
 
         <div className="mt-10">
-            <h2 className="text-2xl font-bold font-headline text-center mb-6">This Week's Goal</h2>
-            <WeeklyGoal />
+            <GoalCoach />
         </div>
       </main>
     </div>
