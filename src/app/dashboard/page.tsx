@@ -27,7 +27,7 @@ type DashboardProps = {
 
 export default function Dashboard({ action, onActionComplete }: DashboardProps) {
   const { user, checkAndAwardAchievements } = useUser();
-  const { habits, checkIn } = useHabits();
+  const { habits, checkIn, addHabit, toggleHabitArchive } = useHabits();
   const [showConfetti, setShowConfetti] = useState(false);
   const [confettiKey, setConfettiKey] = useState(0);
 
@@ -94,7 +94,9 @@ export default function Dashboard({ action, onActionComplete }: DashboardProps) 
 
       // Check for new achievements
       if (user) {
-        checkAndAwardAchievements(habits);
+        // Pass the latest state of habits to the achievement checker
+        const updatedHabits = habits.map(h => h.id === habitId ? updatedHabit : h);
+        checkAndAwardAchievements(updatedHabits);
       }
 
       // Trigger the special Victory Image on level up or major streak milestones
@@ -154,14 +156,6 @@ export default function Dashboard({ action, onActionComplete }: DashboardProps) 
       isLink: true,
       href: '/journal',
     },
-    {
-      id: 'goal-coach',
-      icon: BrainCircuit,
-      title: 'AI Goal Coach',
-      description: 'Chat with your AI coach to plan your ambitions.',
-      action: () => setIsGoalCoachOpen(true),
-      isLink: false,
-    }
   ];
   
   const totalLevel = habits.reduce((sum, habit) => sum + habit.level, 0);
@@ -245,6 +239,22 @@ export default function Dashboard({ action, onActionComplete }: DashboardProps) 
                 </Card>
               )
             })}
+             <Card className="flex flex-col">
+              <CardHeader className="flex-row items-center gap-3 space-y-0 pb-4">
+                  <div className="p-3 rounded-lg bg-primary/10 text-primary">
+                  <BrainCircuit className="w-5 h-5" />
+                </div>
+                <CardTitle className="font-headline text-lg">AI Goal Coach</CardTitle>
+              </CardHeader>
+              <CardContent className="flex-grow">
+                <p className="text-sm text-muted-foreground">Chat with your AI coach to plan your ambitions.</p>
+              </CardContent>
+              <div className="p-4 pt-0">
+                <Button onClick={() => setIsGoalCoachOpen(true)} className="w-full">
+                  Chat with Coach <ArrowRight className="ml-2"/>
+                </Button>
+              </div>
+            </Card>
           </div>
         </div>
         

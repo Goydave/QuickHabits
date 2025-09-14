@@ -114,7 +114,7 @@ export function useHabits() {
   const addHabit = useCallback((habitData: {id?: string, name: string, type?: 'build' | 'quit'}) => {
     const predefinedHabit = habitData.id ? PREDEFINED_HABITS.find(h => h.id === habitData.id) : PREDEFINED_HABITS.find(h => h.name === habitData.name);
     
-    const existingHabit = habits.find(h => h.name.toLowerCase() === habitData.name.toLowerCase());
+    const existingHabit = habits.find(h => (predefinedHabit && h.id === predefinedHabit.id) || h.name.toLowerCase() === habitData.name.toLowerCase());
     if (existingHabit) {
         // If habit exists and is archived, unarchive it
         if (existingHabit.isArchived) {
@@ -158,3 +158,5 @@ export function useHabits() {
 
   return { habits, setHabits, checkIn, isLoading, clearHabits, addHabit, removeHabit, toggleHabitArchive };
 }
+
+    
