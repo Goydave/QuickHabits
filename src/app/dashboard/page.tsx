@@ -16,7 +16,7 @@ import AudioMeditationPlayer from '@/components/AudioMeditationPlayer';
 import VictoryImageDialog from '@/components/VictoryImageDialog';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Library, BookMarked, Check, ArrowRight } from 'lucide-react';
+import { Library, BookMarked, Check, ArrowRight, BrainCircuit } from 'lucide-react';
 import Link from 'next/link';
 import GoalCoach from '@/components/GoalCoach';
 
@@ -33,6 +33,7 @@ export default function Dashboard({ action, onActionComplete }: DashboardProps) 
 
   const [isAudioPlayerOpen, setIsAudioPlayerOpen] = useState(false);
   const [isMeditationPlayerOpen, setIsMeditationPlayerOpen] = useState(false);
+  const [isGoalCoachOpen, setIsGoalCoachOpen] = useState(false);
   
   const [completedFeatures, setCompletedFeatures] = useState<string[]>([]);
   
@@ -140,6 +141,7 @@ export default function Dashboard({ action, onActionComplete }: DashboardProps) 
       icon: Library, 
       title: 'Visit a Library', 
       description: 'Explore a world of books and knowledge.', 
+      action: () => {}, // Placeholder, handled by Link
       isLink: true,
       href: '/library'
     },
@@ -148,9 +150,18 @@ export default function Dashboard({ action, onActionComplete }: DashboardProps) 
       icon: BookMarked, 
       title: 'Write in Reading Journal', 
       description: 'Reflect on your reading journey.',
+      action: () => {}, // Placeholder, handled by Link
       isLink: true,
       href: '/journal',
     },
+    {
+      id: 'goal-coach',
+      icon: BrainCircuit,
+      title: 'AI Goal Coach',
+      description: 'Chat with your AI coach to plan your ambitions.',
+      action: () => setIsGoalCoachOpen(true),
+      isLink: false,
+    }
   ];
   
   const totalLevel = habits.reduce((sum, habit) => sum + habit.level, 0);
@@ -185,6 +196,8 @@ export default function Dashboard({ action, onActionComplete }: DashboardProps) 
         habitName={victoryState.habitName}
       />
 
+      <GoalCoach isOpen={isGoalCoachOpen} onOpenChange={setIsGoalCoachOpen} />
+
 
       <Header />
       <main className="flex-grow pt-4 md:pt-8 max-w-6xl mx-auto w-full">
@@ -201,7 +214,7 @@ export default function Dashboard({ action, onActionComplete }: DashboardProps) 
 
         <div className="mb-10">
           <h2 className="text-2xl font-bold font-headline text-center mb-6">Literary Corner</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
             {literaryFeatures.map(feature => {
               const isCompleted = completedFeatures.includes(feature.id);
               return (
@@ -223,8 +236,9 @@ export default function Dashboard({ action, onActionComplete }: DashboardProps) 
                            </Link>
                         </Button>
                       ) : (
-                        <Button onClick={() => {}} disabled={isCompleted} className="w-full">
-                          {isCompleted ? <><Check className="mr-2"/> Done for Today</> : 'Mark as Done'}
+                        <Button onClick={feature.action} disabled={isCompleted} className="w-full">
+                           {feature.id === 'goal-coach' ? <>Chat with Coach <ArrowRight className="ml-2"/></> :
+                            (isCompleted ? <><Check className="mr-2"/> Done for Today</> : 'Mark as Done')}
                         </Button>
                       )}
                   </div>
@@ -245,10 +259,6 @@ export default function Dashboard({ action, onActionComplete }: DashboardProps) 
               onCheckIn={() => handleCheckIn(habit.id)}
             />
           ))}
-        </div>
-
-        <div className="mt-10">
-            <GoalCoach />
         </div>
       </main>
     </div>

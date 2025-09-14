@@ -3,6 +3,15 @@
 
 import { useState, useEffect, useRef } from 'react';
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogClose
+} from '@/components/ui/dialog';
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -11,12 +20,10 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Loader2, Send, Sparkles, User, Bot, Trash } from 'lucide-react';
+import { Loader2, Send, Sparkles, User, Bot, Trash, X } from 'lucide-react';
 import { ChatMessage } from '@/lib/types';
 import { getGoalCoaching } from '@/ai/flows/goal-coach-flow';
 import { toast } from 'sonner';
@@ -30,7 +37,12 @@ const STORAGE_KEY = 'quickhabits-goal-coach-chat';
 const INITIAL_MESSAGE: ChatMessage = { id: uuidv4(), role: 'ai', content: "I'm Sparky, your AI Goal Coach! Tell me about an ambition you have, and I'll help you break it down into actionable steps. What's on your mind? ✨" };
 
 
-export default function GoalCoach() {
+type GoalCoachProps = {
+    isOpen: boolean;
+    onOpenChange: (isOpen: boolean) => void;
+};
+
+export default function GoalCoach({ isOpen, onOpenChange }: GoalCoachProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -88,52 +100,56 @@ export default function GoalCoach() {
       setIsLoading(false);
     }
   };
+  
+  const [isAlertOpen, setIsAlertOpen] = useState(false);
 
   const handleClearHistory = () => {
     localStorage.removeItem(STORAGE_KEY);
     setMessages([INITIAL_MESSAGE]);
     toast.success("Chat history cleared!");
+    setIsAlertOpen(false);
   }
 
   return (
-    <Card className="shadow-lg flex flex-col h-[60vh] max-h-[700px]">
-      <CardHeader className="flex flex-row justify-between items-start">
-        <div>
-            <CardTitle className="font-headline text-lg flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-primary"/>
-                AI Goal Coach
-            </CardTitle>
-            <CardDescription>Your personal AI companion for planning and achieving your ambitions.</CardDescription>
-        </div>
-         <AlertDialog>
-            <AlertDialogTrigger asChild>
-                <Button variant="ghost" size="icon" disabled={messages.length <= 1}>
-                    <Trash className="w-4 h-4" />
-                    <span className="sr-only">Clear History</span>
-                </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-                <AlertDialogHeader>
-                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                <AlertDialogDescription>
-                    This action cannot be undone. This will permanently delete your entire conversation history with the Goal Coach.
-                </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction
-                    onClick={handleClearHistory}
-                    className="bg-destructive hover:bg-destructive/90"
-                >
-                    Clear History
-                </AlertDialogAction>
-                </AlertDialogFooter>
-            </AlertDialogContent>
-        </AlertDialog>
-      </CardHeader>
-      <CardContent className="flex-grow overflow-hidden flex flex-col gap-4">
-        <ScrollArea className="flex-grow pr-4 -mr-4" viewportRef={scrollAreaRef}>
-          <div className="space-y-6">
+    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-2xl h-[80vh] flex flex-col p-0 gap-0">
+        <DialogHeader className="p-6 pb-4 flex flex-row justify-between items-start">
+            <div>
+                 <DialogTitle className="font-headline text-lg flex items-center gap-2">
+                    <Sparkles className="w-5 h-5 text-primary"/>
+                    AI Goal Coach
+                </DialogTitle>
+                <DialogDescription>Your personal AI companion for planning and achieving your ambitions.</DialogDescription>
+            </div>
+             <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
+                <AlertDialogTrigger asChild>
+                    <Button variant="ghost" size="icon" disabled={messages.length <= 1}>
+                        <Trash className="w-4 h-4" />
+                        <span className="sr-only">Clear History</span>
+                    </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                        This action cannot be undone. This will permanently delete your entire conversation history with the Goal Coach.
+                    </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                        onClick={handleClearHistory}
+                        className="bg-destructive hover:bg-destructive/90"
+                    >
+                        Clear History
+                    </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+        </DialogHeader>
+
+        <ScrollArea className="flex-grow px-6" viewportRef={scrollAreaRef}>
+            <div className="space-y-6 pb-4">
             <AnimatePresence>
                 {messages.map((message) => (
                 <motion.div
@@ -188,18 +204,20 @@ export default function GoalCoach() {
             )}
           </div>
         </ScrollArea>
-        <form onSubmit={handleSendMessage} className="flex items-center gap-2 pt-4 border-t">
-          <Input
-            placeholder="Tell me about your goal..."
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            disabled={isLoading}
-          />
-          <Button type="submit" size="icon" disabled={isLoading || !input.trim()}>
-            {isLoading ? <Loader2 className="animate-spin" /> : <Send />}
-          </Button>
-        </form>
-      </CardContent>
-    </Card>
+        <div className="p-6 pt-4 border-t bg-background">
+            <form onSubmit={handleSendMessage} className="flex items-center gap-2">
+            <Input
+                placeholder="Tell me about your goal..."
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                disabled={isLoading}
+            />
+            <Button type="submit" size="icon" disabled={isLoading || !input.trim()}>
+                {isLoading ? <Loader2 className="animate-spin" /> : <Send />}
+            </Button>
+            </form>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }
