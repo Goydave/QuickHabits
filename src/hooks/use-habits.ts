@@ -111,24 +111,33 @@ export function useHabits() {
     return updatedHabit;
   }, [habits, setHabits]);
 
-  const addHabit = useCallback((habitData: {id?: string, name: string, type?: 'build' | 'quit'}) => {
-    const predefinedHabit = habitData.id ? PREDEFINED_HABITS.find(h => h.id === habitData.id) : PREDEFINED_HABITS.find(h => h.name === habitData.name);
-    
-    const existingHabit = habits.find(h => (predefinedHabit && h.id === predefinedHabit.id) || h.name.toLowerCase() === habitData.name.toLowerCase());
+ const addHabit = useCallback((habitData: {id?: string, name: string, type?: 'build' | 'quit'}) => {
+    // First, check for a predefined habit by ID or name
+    const predefinedHabit = habitData.id 
+        ? PREDEFINED_HABITS.find(h => h.id === habitData.id) 
+        : PREDEFINED_HABITS.find(h => h.name.toLowerCase() === habitData.name.toLowerCase());
+
+    const habitId = predefinedHabit ? predefinedHabit.id : (habitData.id || uuidv4());
+    const habitName = predefinedHabit ? predefinedHabit.name : habitData.name;
+
+    const existingHabit = habits.find(h => h.id === habitId || h.name.toLowerCase() === habitName.toLowerCase());
+
     if (existingHabit) {
-        // If habit exists and is archived, unarchive it
         if (existingHabit.isArchived) {
+            // If the habit exists but is archived, unarchive it
             toggleHabitArchive(existingHabit.id);
         }
+        // If it exists and is active, do nothing.
         return;
     }
-
+    
+    // If it doesn't exist, create a new habit
     const newHabit: Habit = {
-      id: predefinedHabit ? predefinedHabit.id : uuidv4(),
-      name: predefinedHabit ? predefinedHabit.name : habitData.name,
-      icon: predefinedHabit ? predefinedHabit.icon : Sparkles, // Default icon for custom habits
+      id: habitId,
+      name: habitName,
+      icon: predefinedHabit ? predefinedHabit.icon : Sparkles,
       specialAction: predefinedHabit ? predefinedHabit.specialAction : undefined,
-      type: habitData.type || 'build',
+      type: habitData.type || (predefinedHabit ? predefinedHabit.type : 'build'),
       currentStreak: 0,
       longestStreak: 0,
       lastCheckinDate: null,

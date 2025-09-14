@@ -37,7 +37,8 @@ export default function Onboarding() {
       return;
     }
     
-    selectedHabits.forEach(habit => addHabit({ name: habit.name }));
+    // Pass the full suggested habit object, including name and type
+    selectedHabits.forEach(habit => addHabit({ name: habit.name, type: 'build' }));
 
     // Force a full page reload to ensure the new state is recognized
     // and the user is redirected to the dashboard correctly.
