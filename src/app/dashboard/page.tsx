@@ -18,7 +18,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Library, BookMarked, Check, ArrowRight, BrainCircuit } from 'lucide-react';
 import Link from 'next/link';
-import GoalCoach from '@/components/GoalCoach';
 
 type DashboardProps = {
   action?: string | null;
@@ -33,7 +32,6 @@ export default function Dashboard({ action, onActionComplete }: DashboardProps) 
 
   const [isAudioPlayerOpen, setIsAudioPlayerOpen] = useState(false);
   const [isMeditationPlayerOpen, setIsMeditationPlayerOpen] = useState(false);
-  const [isGoalCoachOpen, setIsGoalCoachOpen] = useState(false);
   
   const [completedFeatures, setCompletedFeatures] = useState<string[]>([]);
   
@@ -156,6 +154,15 @@ export default function Dashboard({ action, onActionComplete }: DashboardProps) 
       isLink: true,
       href: '/journal',
     },
+     { 
+      id: 'goal-coach', 
+      icon: BrainCircuit, 
+      title: 'AI Goal Coach', 
+      description: 'Chat with your AI coach to plan your ambitions.',
+      action: () => {}, // Placeholder, handled by Link
+      isLink: true,
+      href: '/coach',
+    },
   ];
   
   const totalLevel = habits.reduce((sum, habit) => sum + habit.level, 0);
@@ -189,9 +196,6 @@ export default function Dashboard({ action, onActionComplete }: DashboardProps) 
         onOpenChange={(isOpen) => setVictoryState({ isOpen, habitName: null })}
         habitName={victoryState.habitName}
       />
-
-      <GoalCoach isOpen={isGoalCoachOpen} onOpenChange={setIsGoalCoachOpen} />
-
 
       <Header />
       <main className="flex-grow pt-4 md:pt-8 max-w-6xl mx-auto w-full">
@@ -230,31 +234,14 @@ export default function Dashboard({ action, onActionComplete }: DashboardProps) 
                            </Link>
                         </Button>
                       ) : (
-                        <Button onClick={feature.action} disabled={isCompleted} className="w-full">
-                           {feature.id === 'goal-coach' ? <>Chat with Coach <ArrowRight className="ml-2"/></> :
-                            (isCompleted ? <><Check className="mr-2"/> Done for Today</> : 'Mark as Done')}
+                        <Button onClick={() => {}} disabled={isCompleted} className="w-full">
+                           {isCompleted ? <><Check className="mr-2"/> Done for Today</> : 'Mark as Done'}
                         </Button>
                       )}
                   </div>
                 </Card>
               )
             })}
-             <Card className="flex flex-col">
-              <CardHeader className="flex-row items-center gap-3 space-y-0 pb-4">
-                  <div className="p-3 rounded-lg bg-primary/10 text-primary">
-                  <BrainCircuit className="w-5 h-5" />
-                </div>
-                <CardTitle className="font-headline text-lg">AI Goal Coach</CardTitle>
-              </CardHeader>
-              <CardContent className="flex-grow">
-                <p className="text-sm text-muted-foreground">Chat with your AI coach to plan your ambitions.</p>
-              </CardContent>
-              <div className="p-4 pt-0">
-                <Button onClick={() => setIsGoalCoachOpen(true)} className="w-full">
-                  Chat with Coach <ArrowRight className="ml-2"/>
-                </Button>
-              </div>
-            </Card>
           </div>
         </div>
         
